@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="black">#FF000000</color>
+    <color name="white">#FFFFFFFF</color>
+
+    <!-- colors.xml -->
+    <color name="guessed_word_color">#6B8F71</color>
+    <color name="default_word_color">#000000</color>
+
+    <!-- Color Scheme 0: "Anagramama" -->
+    <color name="temp1">#889AFA</color>
+    <color name="temp2">#98C8E6</color>
+    <color name="temp3">#B1F6A9</color>
+    <color name="temp4">#DAE330</color>
+    <color name="small_btn">#FE8200</color>
+
+    <color name="square_background_color">#DAE330</color>
+    <color name="square_border_color">#B1F6A9</color>
+
+    <!-- Color Scheme 1: "Word Garden" -->
+    <color name="Background_Garden">#DDEAD1</color>
+    <color name="Primary_Text_Garden">#264E36</color>
+    <color name="Secondary_Text_Garden">#6B8F71</color>
+    <color name="Highlight_Selection_Garden">#FFD23F</color>
+    <color name="Buttons_Garden">#FF6F59</color>
+    <color name="Accent_Garden">#FFE5E0</color>
+
+</resources>

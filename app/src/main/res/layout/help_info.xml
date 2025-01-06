@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:padding="15dp"
+    android:layout_margin="25dp"
+    android:orientation="vertical"
+    android:background="@color/Background_Garden"
+    >
+    <Button
+        android:id="@+id/exit_button"
+        android:text="X"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="right"
+        android:backgroundTint="@color/Buttons_Garden"
+        />
+    <TextView
+        android:text="@string/Instructions"
+        android:id="@+id/instractions_textview"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="20sp"
+        android:textStyle="bold"
+        android:layout_margin="5dp"
+        android:textColor="@color/Primary_Text_Garden"
+        />
+
+    <TextView
+        android:id="@+id/copy_right_textview"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="5dp"
+        android:text="@string/copyright_info"
+        android:textColor="@color/Secondary_Text_Garden"
+        android:textSize="20sp"
+        android:textStyle="bold"
+        tools:ignore="InvalidId" />
+
+    <TextView
+        android:text="Dedicated to my father."
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="20sp"
+        android:textStyle="bold"
+        android:layout_margin="5dp"
+        android:textColor="@color/Secondary_Text_Garden"
+        />
+</LinearLayout>
