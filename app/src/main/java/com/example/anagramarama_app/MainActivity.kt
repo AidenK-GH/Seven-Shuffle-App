@@ -13,6 +13,7 @@ import kotlin.random.Random
 import android.text.Spannable
 import android.text.SpannableStringBuilder
 import android.text.style.ForegroundColorSpan
+import android.util.Log
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -28,6 +29,7 @@ class MainActivity : AppCompatActivity() {
     // File name for the word list in the assets folder
     private val fileNameWordList = "ag_list.txt"
     private val fileJsonNameGameHistoryBoard = "Game_History_Board.json"
+    private val foldernameWherefileJsonNameGameHistoryBoardIs = "data"
     private var isThereAGameCurrentlyRunning = false
 
     // Data structure to store words categorized by their length
@@ -276,7 +278,7 @@ class MainActivity : AppCompatActivity() {
         )
 
         // Read the existing JSON file
-        val jsonString = readJsonFileFromAssets("data", fileJsonNameGameHistoryBoard)
+        val jsonString = readJsonFile("data", fileJsonNameGameHistoryBoard)
         val jsonObject = JSONObject(jsonString)
         val pastGames = jsonObject.getJSONObject("gameInfo").getJSONArray("pastGames")
 
@@ -285,7 +287,7 @@ class MainActivity : AppCompatActivity() {
 
         // Write the updated JSON back to the file
         val updatedJsonString = jsonObject.toString()
-        writeJsonToFile("data", fileJsonNameGameHistoryBoard, updatedJsonString)
+        writeJsonToFile(updatedJsonString) //"data", fileJsonNameGameHistoryBoard,
     }
 
     private fun getCurrentDate(): String {
@@ -356,7 +358,7 @@ class MainActivity : AppCompatActivity() {
         val dialog = builder.create()
 
         // Read the JSON file
-        val jsonString = readJsonFileFromAssets("data", fileJsonNameGameHistoryBoard)
+        val jsonString = readJsonFile("data", fileJsonNameGameHistoryBoard)
         val jsonObject = JSONObject(jsonString)
         val pastGames = jsonObject.getJSONObject("gameInfo").getJSONArray("pastGames")
 
@@ -366,8 +368,8 @@ class MainActivity : AppCompatActivity() {
             val game = pastGames.getJSONObject(i)
             gamesList.add(
                 PastGame(
-                    date = game.getString("date"),
                     sevenLetterWord = game.getString("sevenLetterWord"),
+                    date = game.getString("date"),
                     totalWordsCouldGet = game.getInt("howManyTotalWordsCouldGet"),
                     totalWordsGot = game.getInt("howManyTotalWordsGot")
                 )
@@ -428,10 +430,26 @@ class MainActivity : AppCompatActivity() {
         return applicationContext.assets.open(filePath).bufferedReader().use { it.readText() }
     }
 
-    private fun writeJsonToFile(folder: String, fileName: String, jsonString: String) {
+    private fun readJsonFile(folder: String, fileName: String): String {
+        val file = File(filesDir, "$folder/$fileName")
+        return if (file.exists()) {
+            file.readText()
+        } else {
+            "{}"  // Return empty JSON if file doesn't exist
+        }
+    }
+
+    private fun writeJsonToFile_old(folder: String, fileName: String, jsonString: String) {
         val file = File(filesDir, "$folder/$fileName")
         file.parentFile?.mkdirs() // Create directories if they don't exist
         file.writeText(jsonString)
+    }
+
+    private fun writeJsonToFile(jsonString: String) {
+        val file = File(filesDir, "$foldernameWherefileJsonNameGameHistoryBoardIs/$fileJsonNameGameHistoryBoard")
+        file.parentFile?.mkdirs()
+        file.writeText(jsonString)
+        Log.d("FileWrite", "JSON saved to ${file.absolutePath}")
     }
 
 }
