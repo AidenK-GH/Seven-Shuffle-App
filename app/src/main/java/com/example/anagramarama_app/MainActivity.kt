@@ -1,7 +1,9 @@
 package com.example.anagramarama_app
 
+import android.content.Context
 import android.os.Bundle
 import android.os.CountDownTimer
+import android.text.Layout
 import android.text.method.DigitsKeyListener
 import android.widget.Button
 import android.widget.EditText
@@ -14,6 +16,8 @@ import android.text.Spannable
 import android.text.SpannableStringBuilder
 import android.text.style.ForegroundColorSpan
 import android.util.Log
+import android.view.View
+import android.widget.LinearLayout
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -23,20 +27,34 @@ import java.io.File
 
 class MainActivity : AppCompatActivity() {
 
-    //private lateinit var dataManager: DataManager
-    //private lateinit var dialogManager: DialogManager
-
     // File name for the word list in the assets folder
     private val fileNameWordList = "ag_list.txt"
+    private val fileNameJSONAllWordMap = "all_word_map.json"
     private val fileJsonNameGameHistoryBoard = "Game_History_Board.json"
     private val foldernameWherefileJsonNameGameHistoryBoardIs = "data"
+
+    // flags
     private var isThereAGameCurrentlyRunning = false
+    enum class InputMode {
+        KEYBOARD,
+        BUTTONS
+        // Add more later, like SWIPE, VOICE, etc.
+    }
+    private var currentInputMode: InputMode = InputMode.BUTTONS
 
     // Data structure to store words categorized by their length
-    private val wordListsByLength: MutableMap<Int, MutableList<WordEntry>> = mutableMapOf()
-    private lateinit var sevenLetterWord: String
+    private val wordListsByLength: MutableMap<Int, MutableList<WordEntry>> = mutableMapOf() // keeps the words for current game
+    private lateinit var sevenLetterWord: String // 7 letter word of the current game
+    //private val allWordsMap: MutableMap<String, List<String>> = loadAllWordMapFromAssets(this)
+    // map that keeps the Library of all the words. key is the letters that used to make words in value:list.
+   // private val listSevenLetterWords: List<String> // list of all 7 letter words. faster than reading asset file everytime.
+
+
+    private val userInputSequence = mutableListOf<Pair<Button, Char>>()
+    private lateinit var letterButtons: List<Button>
 
     // UI elements
+    private lateinit var userInputButtonsTextView: TextView
     private lateinit var lettersTextView: TextView
     private lateinit var answersTempTextView: TextView
     private lateinit var newGameBtn: Button
@@ -49,6 +67,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var userInputEditText: EditText
     private lateinit var checkInputTextView: TextView
     private lateinit var timerTextView: TextView
+    private lateinit var inputLayout2Layout: LinearLayout
 
     // Timer setup for a 5-minute countdown
     private lateinit var gameTimer: CountDownTimer
@@ -74,8 +93,21 @@ class MainActivity : AppCompatActivity() {
         userInputEditText = findViewById(R.id.userInput_EditText)
         checkInputTextView = findViewById(R.id.checkInput_textview)
         timerTextView = findViewById(R.id.timer_textview)
+        inputLayout2Layout = findViewById<LinearLayout>(R.id.input_type_2_layout)
+
+        userInputButtonsTextView = findViewById(R.id.userInput_Buttons_textview)
+        letterButtons = listOf(
+            findViewById(R.id.input_1_btn),
+            findViewById(R.id.input_2_btn),
+            findViewById(R.id.input_3_btn),
+            findViewById(R.id.input_4_btn),
+            findViewById(R.id.input_5_btn),
+            findViewById(R.id.input_6_btn),
+            findViewById(R.id.input_7_btn)
+        )
 
         setupTimer()
+        updateInputModeUI()
 
         // Set up button actions
         newGameBtn.setOnClickListener {
@@ -117,14 +149,12 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    // Data class to track each word and whether it has been guessed
-    data class WordEntry(val word: String, var isGuessed: Boolean = false)
-
     // Starts a new game by resetting game data and setting up word lists
     private fun startNewGame() {
         isThereAGameCurrentlyRunning = true
         sevenLetterWord = selectRandomlyASevenLetterWordFromList()
         setupWordLists()
+
         setupTimer()
         gameTimer.start()
 
@@ -132,20 +162,84 @@ class MainActivity : AppCompatActivity() {
         lettersTextView.text = shuffleWord(sevenLetterWord)
         updateInputFilter()
         updateAnswersTempTextView()
+
+        userInputSequence.clear()
+        updateUserInputFieldFromButtons()
+        updateInputModeUI()
+
+        letterButtons.forEachIndexed { index, button ->
+            val letter = sevenLetterWord[index]
+            button.text = letter.toString()
+            button.isSelected = false
+            button.backgroundTintList = ContextCompat.getColorStateList(this, R.color.Buttons_Garden)
+
+            button.setOnClickListener {
+                val existingIndex = userInputSequence.indexOfFirst { it.first == button }
+
+                if (existingIndex == -1) {
+                    userInputSequence.add(button to letter)
+                    button.isSelected = true
+                    button.backgroundTintList = ContextCompat.getColorStateList(this, R.color.Highlight_Selection_Garden)
+                } else {
+                    userInputSequence.removeAt(existingIndex)
+                    button.isSelected = false
+                    button.backgroundTintList = ContextCompat.getColorStateList(this, R.color.Buttons_Garden)
+                }
+
+                updateUserInputFieldFromButtons()
+            }
+        }
+
+        // Change the input style depending on the settings (buttons or keyboard)
+        // if buttons: disable keyboard, show buttons; else: enable keyboard, hide buttons
     }
 
-    // Populates the word lists by length from the available words that can be formed from sevenLetterWord
-    private fun setupWordLists() {
-        wordListsByLength.clear()
-        val allWords = readWordsFromAssets()
+    fun loadAllWordMapFromAssets(context: Context): MutableMap<String, List<String>> {
+        // 1. Read file as string
+        val jsonText = context.assets.open(fileNameJSONAllWordMap)
+            .bufferedReader()
+            .use { it.readText() }
 
-        for (word in allWords) {
-            if (canBeFormedFrom(word, sevenLetterWord)) {
-                val length = word.length
-                wordListsByLength.getOrPut(length) { mutableListOf() }.add(WordEntry(word))
+        // 2. Parse with org.json
+        val jsonObject = JSONObject(jsonText)
+
+        // 3. Build map
+        val map = mutableMapOf<String, List<String>>()
+        val keys = jsonObject.keys()
+        while (keys.hasNext()) {
+            val key = keys.next()
+            val jsonArray = jsonObject.getJSONArray(key)
+            val list = mutableListOf<String>()
+            for (i in 0 until jsonArray.length()) {
+                list.add(jsonArray.getString(i))
+            }
+            map[key] = list
+        }
+        return map
+    }
+
+    private fun updateInputModeUI() {
+        when (currentInputMode) {
+            InputMode.KEYBOARD -> {
+                userInputEditText.isEnabled = true
+                userInputEditText.visibility = View.VISIBLE
+                userInputButtonsTextView.visibility = View.GONE
+                inputLayout2Layout.visibility = View.GONE
+            }
+            InputMode.BUTTONS -> {
+                userInputEditText.isEnabled = false
+                userInputEditText.visibility = View.GONE
+                userInputButtonsTextView.visibility = View.VISIBLE
+                inputLayout2Layout.visibility = View.VISIBLE
             }
         }
     }
+
+    private fun updateUserInputFieldFromButtons() {
+        val currentWord = userInputSequence.map { it.second }.joinToString("")
+        userInputButtonsTextView.text = currentWord
+    }
+
 
     // Updates input filter to allow only characters from the seven-letter word
     private fun updateInputFilter() {
@@ -153,9 +247,30 @@ class MainActivity : AppCompatActivity() {
         userInputEditText.keyListener = DigitsKeyListener.getInstance(allowedCharacters)
     }
 
+    // Looks at which input type we are (buttons or keyboard) and collects the input accordingly
+    private fun collectUserInput(): String {
+        return when (currentInputMode) {
+            InputMode.KEYBOARD -> {
+                userInputEditText.text.toString().trim()
+            }
+            InputMode.BUTTONS -> {
+                userInputSequence.map { it.second }.joinToString("")
+            }
+        }
+    }
+
     // Checks user input against words in wordListsByLength and updates the UI if guessed correctly
     private fun checkUserInput() {
-        val userInput = userInputEditText.text.toString().trim()
+        var userInput = collectUserInput() //by default gets buttons input
+        userInput = when (currentInputMode) {
+            InputMode.KEYBOARD -> {
+                userInputEditText.text.toString().trim()
+            }
+
+            InputMode.BUTTONS -> {
+                collectUserInput()
+            }
+        }
 
         val wordLength = userInput.length
         val entries = wordListsByLength[wordLength]
@@ -175,7 +290,13 @@ class MainActivity : AppCompatActivity() {
             checkInputTextView.text = "WRONG"
         }
 
+        //keyboard
         userInputEditText.text.clear()
+
+        //buttons
+        userInputButtonsTextView.text = ""
+        userInputSequence.clear()
+        resetButtons()
     }
 
     // Updates the answersTempTextView with the list of all words categorized by length, with colored words
@@ -226,6 +347,8 @@ class MainActivity : AppCompatActivity() {
         isThereAGameCurrentlyRunning = false
         gameTimer.cancel()
 
+        resetButtons()
+
         val spannableBuilder = SpannableStringBuilder()
 
         wordListsByLength.keys.sorted().forEach { length ->
@@ -267,6 +390,13 @@ class MainActivity : AppCompatActivity() {
 
         answersTempTextView.text = spannableBuilder
         checkInputTextView.text = "Game ended"
+    }
+
+    private fun resetButtons() {
+        letterButtons.forEach {
+            it.isSelected = false;
+            it.backgroundTintList = ContextCompat.getColorStateList(this, R.color.Buttons_Garden);
+        }
     }
 
     private fun saveGameToHistory() {
@@ -346,7 +476,25 @@ class MainActivity : AppCompatActivity() {
         builder.setView(dialogView)
 
         val dialog = builder.create()
-        dialogView.findViewById<Button>(R.id.exit_button).setOnClickListener { dialog.dismiss() }
+
+        dialogView.findViewById<Button>(R.id.exit_button).setOnClickListener {
+            dialog.dismiss()
+        }
+
+        val toggleInputBtn = dialogView.findViewById<Button>(R.id.toggle_input_mode_btn)
+        toggleInputBtn.text = when (currentInputMode) {
+            InputMode.KEYBOARD -> "Switch to Buttons"
+            InputMode.BUTTONS -> "Switch to Keyboard"
+        }
+
+        toggleInputBtn.setOnClickListener {
+            currentInputMode = when (currentInputMode) {
+                InputMode.KEYBOARD -> InputMode.BUTTONS
+                InputMode.BUTTONS -> InputMode.KEYBOARD
+            }
+            dialog.dismiss()
+            updateInputModeUI()  // ⬅️ This applies the visual change after dialog closes
+        }
 
         dialog.show()
     }
@@ -390,6 +538,8 @@ class MainActivity : AppCompatActivity() {
         dialog.show()
     }
 
+    //------------------------------------------------------------------------------------------------------------------------------
+
     // Reads all lines from the word list file in assets
     private fun readWordsFromAssets(): List<String> {
         val inputStream = assets.open(fileNameWordList)
@@ -403,6 +553,19 @@ class MainActivity : AppCompatActivity() {
         return words[Random.nextInt(words.size)]
     }
 
+    // Populates the word lists by length from the available words that can be formed from sevenLetterWord
+    private fun setupWordLists() {
+        wordListsByLength.clear()
+        val allWords = readWordsFromAssets()
+
+        for (word in allWords) {
+            if (canBeFormedFrom(word, sevenLetterWord)) {
+                val length = word.length
+                wordListsByLength.getOrPut(length) { mutableListOf() }.add(WordEntry(word))
+            }
+        }
+    }
+
     // Checks if subWord can be formed from baseWord by comparing character counts
     private fun canBeFormedFrom(subWord: String, baseWord: String): Boolean {
         val baseCharCounts = baseWord.groupingBy { it }.eachCount().toMutableMap()
@@ -413,6 +576,8 @@ class MainActivity : AppCompatActivity() {
         }
         return true
     }
+
+    //--------------------------------------------------------------------------------------------------------------------------------------------
 
     // Checks if the player has won by verifying all words have been guessed
     private fun hasUserWon(): Boolean {

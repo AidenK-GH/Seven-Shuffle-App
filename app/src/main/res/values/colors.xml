@@ -25,4 +25,8 @@
     <color name="Buttons_Garden">#FF6F59</color>
     <color name="Accent_Garden">#FFE5E0</color>
 
+    <!-- button colors -->
+    <color name="selected_button_color">#FF9800</color> <!-- Orange -->
+    <color name="default_button_color">#8BC34A</color> <!-- Green -->
+
 </resources>

@@ -8,6 +8,8 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.anagramarama_app.R
 import com.example.anagramarama_app.data.PastGame
+import org.json.JSONObject
+
 //import com.example.anagramarama_app.data.PastGamesAdapter
 
 class DialogManager(private val context: Context) {
@@ -39,4 +41,33 @@ class DialogManager(private val context: Context) {
         }
         dialog.show()
     }
+
+    /*
+    // Shows a dialog to confirm if the user wants to start a new game
+    fun showNewGameConfirmationDialog() {
+        val builder = AlertDialog.Builder(this)
+        val dialogView = layoutInflater.inflate(R.layout.ask_new_game, null)
+        builder.setView(dialogView)
+
+        val dialog = builder.create()
+        dialogView.findViewById<Button>(R.id.exit_button).setOnClickListener { dialog.dismiss() }
+        dialogView.findViewById<Button>(R.id.no_button).setOnClickListener { dialog.dismiss() }
+        dialogView.findViewById<Button>(R.id.new_game_btn).setOnClickListener {
+            startNewGame()
+            dialog.dismiss()
+        }
+        dialog.show()
+    }
+
+    fun showSettingsDialog() {
+        val builder = AlertDialog.Builder(this)
+        val dialogView = layoutInflater.inflate(R.layout.setting_window, null)
+        builder.setView(dialogView)
+
+        val dialog = builder.create()
+        dialogView.findViewById<Button>(R.id.exit_button).setOnClickListener { dialog.dismiss() }
+
+        dialog.show()
+    }
+    */
 }

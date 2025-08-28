@@ -30,8 +30,9 @@
             android:backgroundTint="@color/Buttons_Garden"
             android:text="X" />
     </LinearLayout>
+
     <TextView
-        android:text="Key Board Options:"
+        android:text="Input Options:"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textSize="20sp"
@@ -39,13 +40,15 @@
         android:layout_margin="5dp"
         android:textColor="@color/Primary_Text_Garden"
         />
-    <Spinner
-        android:id="@+id/keyBoardSpinner"
-        android:layout_width="match_parent"
+
+    <Button
+        android:id="@+id/toggle_input_mode_btn"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:entries="@array/theme_options"
-        android:backgroundTint="@color/Buttons_Garden"
-        android:background="@color/Buttons_Garden"/>
+        android:layout_margin="8dp"
+        android:text="Switch Input Mode"
+        />
+
     <TextView
         android:text="Theme Colors:"
         android:layout_width="wrap_content"
@@ -62,4 +65,5 @@
         android:entries="@array/theme_options"
         android:background="@color/Buttons_Garden"
         />
+
 </LinearLayout>

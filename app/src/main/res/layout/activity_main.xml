@@ -77,7 +77,19 @@
         android:layout_margin="5dp">
         <TextView
             android:id="@+id/letters_textview"
-            android:text=" A B C D E F G"
+            android:text=" T E X T E D I T"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textSize="50sp"
+            android:textStyle="bold"
+            android:layout_margin="5dp"
+            android:textColor="@color/Primary_Text_Garden"
+            android:background="@color/Accent_Garden"
+            />
+
+        <TextView
+            android:id="@+id/userInput_Buttons_textview"
+            android:text=" B U T T O N S"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:textSize="50sp"
@@ -126,7 +138,7 @@
             />
         <TextView
             android:id="@+id/checkInput_textview"
-            android:text="place holder"
+            android:text=""
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:textSize="18sp"
@@ -136,6 +148,107 @@
             android:textColor="@color/Primary_Text_Garden"
             />
     </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/input_type_2_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:gravity="center"
+        android:padding="16dp">
+
+        <!-- First row: 4 buttons -->
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center">
+
+            <Button
+                android:id="@+id/input_1_btn"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="5dp"
+                android:backgroundTint="@color/Buttons_Garden"
+                android:text="X"
+                android:textSize="18sp"
+                />
+            <Button
+                android:id="@+id/input_2_btn"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="5dp"
+                android:backgroundTint="@color/Buttons_Garden"
+                android:text="X"
+                android:textSize="18sp"
+                />
+            <Button
+                android:id="@+id/input_3_btn"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="5dp"
+                android:backgroundTint="@color/Buttons_Garden"
+                android:text="X"
+                android:textSize="18sp"
+                />
+
+        </LinearLayout>
+
+        <!-- Second row: 3 buttons -->
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center">
+
+            <Button
+                android:id="@+id/input_4_btn"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="5dp"
+                android:backgroundTint="@color/Buttons_Garden"
+                android:text="X"
+                android:textSize="18sp"
+                />
+            <Button
+                android:id="@+id/input_5_btn"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="5dp"
+                android:backgroundTint="@color/Buttons_Garden"
+                android:text="X"
+                android:textSize="18sp"
+                />
+            <Button
+                android:id="@+id/input_6_btn"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="5dp"
+                android:backgroundTint="@color/Buttons_Garden"
+                android:text="X"
+                android:textSize="18sp"
+                />
+
+        </LinearLayout>
+        <!-- 3 row: 1 button -->
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center">
+
+            <Button
+                android:id="@+id/input_7_btn"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="5dp"
+                android:backgroundTint="@color/Buttons_Garden"
+                android:text="X"
+                android:textSize="18sp"
+                />
+        </LinearLayout>
+    </LinearLayout>
+
 
     <LinearLayout
         android:layout_width="match_parent"
