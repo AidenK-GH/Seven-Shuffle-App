@@ -1,11 +1,17 @@
 <resources>
     <string name="app_name">Seven Shuffle</string>
-    <string name="Instructions"> Seven Shuffle is a game, where the goal is to guess as many anagrams as possible, given a set of characters. \n
+    <string name="Instructions"> Seven Shuffle is a game. The goal is to guess as many anagrams as possible, given a set of characters. \n
  An anagram is a word or phrase formed by rearranging the letters of a different word or phrase, typically using all the original letters exactly once.
  </string>
-    <string name="copyright_info">Copyright info - wip</string>
+    <string name="Theme_Change">Heads up! Changing the theme will end any game that’s currently playing. Make sure to finish your game first.</string>
+    <string name="copyright_info">Copyright info - \n
+        © 2025 Aiden Kaminsky.\n
+Licensed under the GPL-2.0 license.\n
+Source available on GitHub: github.com/AidenK-GH/Seven-Shuffle-App
+</string>
     <string-array name="theme_options">
-        <item>Light Theme</item>
-        <item>Dark Theme</item>
+        <item>Light</item>
+        <item>Dark</item>
+        <item>System Default</item>
     </string-array>
 </resources>

@@ -1,4 +1,4 @@
-package com.example.anagramarama_app
+package io.github.aidenk.sevenshuffle
 
 import android.content.Context
 import android.text.TextUtils
@@ -36,10 +36,10 @@ class MyKeyboard @JvmOverloads constructor(
 
     // constructors
     init {
-        init(context, attrs)
+        init(context)
     }
 
-    private fun init(context: Context, attrs: AttributeSet?) {
+    private fun init(context: Context) {
 
         // initialize buttons
         LayoutInflater.from(context).inflate(R.layout.custom_keyboard, this, true)

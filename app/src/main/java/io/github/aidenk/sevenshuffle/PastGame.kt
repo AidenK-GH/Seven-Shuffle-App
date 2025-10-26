@@ -1,4 +1,4 @@
-package com.example.anagramarama_app.data
+package io.github.aidenk.sevenshuffle
 
 data class PastGame(
     val date: String,

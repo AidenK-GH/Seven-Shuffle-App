@@ -1,37 +1,42 @@
-package com.example.anagramarama_app
+package io.github.aidenk.sevenshuffle
 
-import android.content.Context
+import android.animation.ArgbEvaluator
+import android.animation.ValueAnimator
 import android.os.Bundle
 import android.os.CountDownTimer
-import android.text.Layout
-import android.text.method.DigitsKeyListener
-import android.widget.Button
-import android.widget.EditText
-import android.widget.TextView
-import androidx.appcompat.app.AlertDialog
-import androidx.appcompat.app.AppCompatActivity
-import java.io.BufferedReader
-import kotlin.random.Random
 import android.text.Spannable
 import android.text.SpannableStringBuilder
+import android.text.method.DigitsKeyListener
 import android.text.style.ForegroundColorSpan
 import android.util.Log
 import android.view.View
+import android.view.ViewGroup
+import android.widget.AdapterView
+import android.widget.ArrayAdapter
+import android.widget.Button
+import android.widget.EditText
 import android.widget.LinearLayout
+import android.widget.Spinner
+import android.widget.TextView
+import androidx.appcompat.app.AlertDialog
+import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.example.anagramarama_app.data.PastGame
 import org.json.JSONObject
+import java.io.BufferedReader
 import java.io.File
+import kotlin.random.Random
+import android.content.res.Configuration
 
 class MainActivity : AppCompatActivity() {
 
     // File name for the word list in the assets folder
     private val fileNameWordList = "ag_list.txt"
     private val fileNameJSONAllWordMap = "all_word_map.json"
-    private val fileJsonNameGameHistoryBoard = "Game_History_Board.json"
-    private val foldernameWherefileJsonNameGameHistoryBoardIs = "data"
+
+    private val themeTitleList = arrayOf("Light", "Dark", "System Default")
 
     // flags
     private var isThereAGameCurrentlyRunning = false
@@ -45,10 +50,9 @@ class MainActivity : AppCompatActivity() {
     // Data structure to store words categorized by their length
     private val wordListsByLength: MutableMap<Int, MutableList<WordEntry>> = mutableMapOf() // keeps the words for current game
     private lateinit var sevenLetterWord: String // 7 letter word of the current game
-    //private val allWordsMap: MutableMap<String, List<String>> = loadAllWordMapFromAssets(this)
-    // map that keeps the Library of all the words. key is the letters that used to make words in value:list.
-   // private val listSevenLetterWords: List<String> // list of all 7 letter words. faster than reading asset file everytime.
-
+    private val allWordsMap: MutableMap<String, List<String>> = mutableMapOf()
+    // ^ map that keeps the Library of all the words. key is the letters that used to make words in value:list.
+    private lateinit var listSevenLetterWords: List<String> // list of all 7 letter words. faster than reading asset file everytime.
 
     private val userInputSequence = mutableListOf<Pair<Button, Char>>()
     private lateinit var letterButtons: List<Button>
@@ -57,9 +61,11 @@ class MainActivity : AppCompatActivity() {
     private lateinit var userInputButtonsTextView: TextView
     private lateinit var lettersTextView: TextView
     private lateinit var answersTempTextView: TextView
+    private lateinit var progressBarTextview: TextView
     private lateinit var newGameBtn: Button
     private lateinit var solveEndGameBtn: Button
     private lateinit var shuffleBtn: Button
+    private lateinit var cleanBtn: Button
     private lateinit var checkBtn: Button
     private lateinit var helpBtn: Button
     private lateinit var gameHistoryBtn: Button
@@ -73,19 +79,31 @@ class MainActivity : AppCompatActivity() {
     private lateinit var gameTimer: CountDownTimer
     private val gameDurationInMillis: Long = 5 * 60 * 1000
 
+    // animation fade color speed
+    private val fadeColorSpeedMS: Long = 1000
+
+    // Managers
+    private lateinit var dataManager: DataManager
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        //dataManager = DataManager(this)
-        //dialogManager = DialogManager(this)
+        // Managers
+        dataManager = DataManager(this)
+
+        // Initialize data structure
+        allWordsMap.putAll(loadAllWordMapFromAssets())
+        listSevenLetterWords = readWordsFromAssets().filter { it.length == 7 };
 
         // Initialize UI elements
         lettersTextView = findViewById(R.id.letters_textview)
         answersTempTextView = findViewById(R.id.answers_temp_textview)
+        progressBarTextview = findViewById(R.id.progressBar_textview)
         newGameBtn = findViewById(R.id.new_game_btn)
         solveEndGameBtn = findViewById(R.id.solve_end_game_btn)
         shuffleBtn = findViewById(R.id.shuffle_btn)
+        cleanBtn = findViewById(R.id.clean_btn)
         checkBtn = findViewById(R.id.check_btn)
         helpBtn = findViewById(R.id.help_btn)
         gameHistoryBtn = findViewById(R.id.game_history_btn)
@@ -93,7 +111,7 @@ class MainActivity : AppCompatActivity() {
         userInputEditText = findViewById(R.id.userInput_EditText)
         checkInputTextView = findViewById(R.id.checkInput_textview)
         timerTextView = findViewById(R.id.timer_textview)
-        inputLayout2Layout = findViewById<LinearLayout>(R.id.input_type_2_layout)
+        inputLayout2Layout = findViewById(R.id.input_type_2_layout)
 
         userInputButtonsTextView = findViewById(R.id.userInput_Buttons_textview)
         letterButtons = listOf(
@@ -136,6 +154,13 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
+        cleanBtn.setOnClickListener {
+            if (isThereAGameCurrentlyRunning) {
+                //cleanUserInput()
+                backspaceLastInput()
+            }
+        }
+
         solveEndGameBtn.setOnClickListener {
             if (isThereAGameCurrentlyRunning) {
                 endGame()
@@ -153,7 +178,7 @@ class MainActivity : AppCompatActivity() {
     private fun startNewGame() {
         isThereAGameCurrentlyRunning = true
         sevenLetterWord = selectRandomlyASevenLetterWordFromList()
-        setupWordLists()
+        organizeWordsListsFromMapIntoWordListsByLength()
 
         setupTimer()
         gameTimer.start()
@@ -167,11 +192,12 @@ class MainActivity : AppCompatActivity() {
         updateUserInputFieldFromButtons()
         updateInputModeUI()
 
+        val dumySevenLetterWord = sevenLetterWord.toList().shuffled().joinToString("")
         letterButtons.forEachIndexed { index, button ->
-            val letter = sevenLetterWord[index]
+            val letter = dumySevenLetterWord[index]
             button.text = letter.toString()
             button.isSelected = false
-            button.backgroundTintList = ContextCompat.getColorStateList(this, R.color.Buttons_Garden)
+            tintInputButton(button)
 
             button.setOnClickListener {
                 val existingIndex = userInputSequence.indexOfFirst { it.first == button }
@@ -179,24 +205,21 @@ class MainActivity : AppCompatActivity() {
                 if (existingIndex == -1) {
                     userInputSequence.add(button to letter)
                     button.isSelected = true
-                    button.backgroundTintList = ContextCompat.getColorStateList(this, R.color.Highlight_Selection_Garden)
+                    tintInputButton(button)
                 } else {
                     userInputSequence.removeAt(existingIndex)
                     button.isSelected = false
-                    button.backgroundTintList = ContextCompat.getColorStateList(this, R.color.Buttons_Garden)
+                    tintInputButton(button)
                 }
 
                 updateUserInputFieldFromButtons()
             }
         }
-
-        // Change the input style depending on the settings (buttons or keyboard)
-        // if buttons: disable keyboard, show buttons; else: enable keyboard, hide buttons
     }
 
-    fun loadAllWordMapFromAssets(context: Context): MutableMap<String, List<String>> {
+    private fun loadAllWordMapFromAssets(): MutableMap<String, List<String>> {
         // 1. Read file as string
-        val jsonText = context.assets.open(fileNameJSONAllWordMap)
+        val jsonText = assets.open(fileNameJSONAllWordMap)
             .bufferedReader()
             .use { it.readText() }
 
@@ -240,7 +263,6 @@ class MainActivity : AppCompatActivity() {
         userInputButtonsTextView.text = currentWord
     }
 
-
     // Updates input filter to allow only characters from the seven-letter word
     private fun updateInputFilter() {
         val allowedCharacters = sevenLetterWord.toCharArray().toSet().joinToString("")
@@ -261,8 +283,7 @@ class MainActivity : AppCompatActivity() {
 
     // Checks user input against words in wordListsByLength and updates the UI if guessed correctly
     private fun checkUserInput() {
-        var userInput = collectUserInput() //by default gets buttons input
-        userInput = when (currentInputMode) {
+        val userInput: String = when (currentInputMode) {
             InputMode.KEYBOARD -> {
                 userInputEditText.text.toString().trim()
             }
@@ -270,7 +291,7 @@ class MainActivity : AppCompatActivity() {
             InputMode.BUTTONS -> {
                 collectUserInput()
             }
-        }
+        }  //by default gets buttons input
 
         val wordLength = userInput.length
         val entries = wordListsByLength[wordLength]
@@ -279,6 +300,7 @@ class MainActivity : AppCompatActivity() {
         if (wordEntry != null) {
             wordEntry.isGuessed = true
             checkInputTextView.text = "CORRECT"
+            flashErrorBackground(true)
             updateAnswersTempTextView()
 
             // Check if user has won after guessing correctly
@@ -288,20 +310,108 @@ class MainActivity : AppCompatActivity() {
             }
         } else {
             checkInputTextView.text = "WRONG"
+            flashErrorBackground(false)
         }
 
-        //keyboard
-        userInputEditText.text.clear()
+        cleanUserInput()
+    }
 
-        //buttons
-        userInputButtonsTextView.text = ""
-        userInputSequence.clear()
-        resetButtons()
+    private fun flashErrorBackground(isPlayRight: Boolean) {
+        val textViewButtons = findViewById<TextView>(R.id.userInput_Buttons_textview)
+        val editTextKeyboard = findViewById<EditText>(R.id.userInput_EditText)
+
+        // Start color and end color (normal background color)
+        val startColor = ContextCompat.getColor(
+            this,
+            if (isPlayRight) android.R.color.holo_green_light else android.R.color.holo_red_light
+        )
+        val isDark = (resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK) == Configuration.UI_MODE_NIGHT_YES
+        val endColor = //ContextCompat.getColor(this, R.color.Accent_Garden) // define in colors.xml same as your drawable
+            if (isDark) {
+                // DARK THEME
+                ContextCompat.getColor(this, R.color.Primary_Text_Garden)//R.color.Primary_Text_Garden
+            } else {
+                // LIGHT / DEFAULT THEME
+                ContextCompat.getColor(this, R.color.Accent_Garden)//R.color.Accent_Garden
+            }
+
+        // Animate color change
+        val colorAnimation = ValueAnimator.ofObject(ArgbEvaluator(), startColor, endColor)
+        colorAnimation.duration = fadeColorSpeedMS // ms (adjust speed)
+        colorAnimation.addUpdateListener { animator ->
+            editTextKeyboard.setBackgroundColor(animator.animatedValue as Int)
+            textViewButtons.setBackgroundColor(animator.animatedValue as Int)
+        }
+        colorAnimation.start()
+    }
+
+    private fun cleanUserInput() {
+        when (currentInputMode) {
+            InputMode.BUTTONS -> {
+                if (userInputSequence.isNotEmpty()) {
+                    //buttons
+                    userInputButtonsTextView.text = ""
+                    userInputSequence.clear()
+                    resetButtons()
+                }
+            }
+
+            InputMode.KEYBOARD -> {
+                val text = userInputEditText.text
+                if (text.isNotEmpty()) {
+                    //keyboard
+                    userInputEditText.text.clear()
+                }
+            }
+        }
+    }
+
+    private fun backspaceLastInput() {
+        when (currentInputMode) {
+            InputMode.BUTTONS -> {
+                if (userInputSequence.isNotEmpty()) {
+                    // Remove last selected (Button, Char)
+                    val (btn, _) = userInputSequence.removeAt(userInputSequence.size - 1)
+
+                    // Reset just this button’s UI state
+                    btn.isSelected = false
+                    tintInputButton(btn)
+
+                    // Reflect the removal in the user-input preview
+                    updateUserInputFieldFromButtons()
+                }
+            }
+
+            InputMode.KEYBOARD -> {
+                val text = userInputEditText.text
+                if (text.isNotEmpty()) {
+                    // Remove last character
+                    text.delete(text.length - 1, text.length)
+                }
+            }
+        }
+    }
+
+    // Call this whenever a button's selection changes or after a theme change
+    private fun tintInputButton(button: Button) {
+        val isDark = (resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK) == Configuration.UI_MODE_NIGHT_YES
+
+        val colorRes =
+            if (isDark) {
+                // DARK THEME
+                if (button.isSelected) R.color.Highlight_Selection_Garden else R.color.Accent_Garden
+            } else {
+                // LIGHT / DEFAULT THEME
+                if (button.isSelected) R.color.Highlight_Selection_Garden else R.color.Buttons_Garden
+            }
+
+        button.backgroundTintList = ContextCompat.getColorStateList(this, colorRes)
     }
 
     // Updates the answersTempTextView with the list of all words categorized by length, with colored words
     private fun updateAnswersTempTextView() {
         val spannableBuilder = SpannableStringBuilder()
+        var textForProgressBar = ""
 
         wordListsByLength.keys.sorted().forEach { length ->
             val words = wordListsByLength[length] ?: emptyList()
@@ -310,6 +420,7 @@ class MainActivity : AppCompatActivity() {
 
             // Add header with count
             spannableBuilder.append("$length-letter words ($guessedWordsCount / $totalWords):\n")
+            textForProgressBar += "$length($guessedWordsCount/$totalWords) "
 
             // Add words with color
             words.forEachIndexed { index, wordEntry ->
@@ -339,6 +450,7 @@ class MainActivity : AppCompatActivity() {
             spannableBuilder.append("\n\n")
         }
 
+        progressBarTextview.text = textForProgressBar
         answersTempTextView.text = spannableBuilder
     }
 
@@ -359,7 +471,7 @@ class MainActivity : AppCompatActivity() {
             // Add header with count
             spannableBuilder.append("$length-letter words ($guessedWordsCount / $totalWords):\n")
 
-            // Add all words with guessed words in color and unguessed in default color
+            // Add all words with guessed words in color and guessed in default color
             words.forEachIndexed { index, wordEntry ->
                 val start = spannableBuilder.length
                 spannableBuilder.append(wordEntry.word)
@@ -394,8 +506,8 @@ class MainActivity : AppCompatActivity() {
 
     private fun resetButtons() {
         letterButtons.forEach {
-            it.isSelected = false;
-            it.backgroundTintList = ContextCompat.getColorStateList(this, R.color.Buttons_Garden);
+            it.isSelected = false
+            tintInputButton(it)
         }
     }
 
@@ -404,20 +516,9 @@ class MainActivity : AppCompatActivity() {
             "date" to getCurrentDate(),
             "sevenLetterWord" to sevenLetterWord,
             "howManyTotalWordsCouldGet" to wordListsByLength.values.sumOf { it.size },
-            "howManyTotalWordsGot" to wordListsByLength.values.sumOf { it.count { word -> word.isGuessed } }
+            "howManyTotalWordsGot" to wordListsByLength.values.sumOf { it.count { w -> w.isGuessed } }
         )
-
-        // Read the existing JSON file
-        val jsonString = readJsonFile("data", fileJsonNameGameHistoryBoard)
-        val jsonObject = JSONObject(jsonString)
-        val pastGames = jsonObject.getJSONObject("gameInfo").getJSONArray("pastGames")
-
-        // Add the current game to the array
-        pastGames.put(JSONObject(currentGame))
-
-        // Write the updated JSON back to the file
-        val updatedJsonString = jsonObject.toString()
-        writeJsonToFile(updatedJsonString) //"data", fileJsonNameGameHistoryBoard,
+        dataManager.addGame(currentGame)
     }
 
     private fun getCurrentDate(): String {
@@ -442,6 +543,7 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    //------ Dialog ------------------------------------------------------------------------------------------------------------------------
     // Shows a dialog to confirm if the user wants to start a new game
     private fun showNewGameConfirmationDialog() {
         val builder = AlertDialog.Builder(this)
@@ -487,6 +589,43 @@ class MainActivity : AppCompatActivity() {
             InputMode.BUTTONS -> "Switch to Keyboard"
         }
 
+        val themeSpinner = dialogView.findViewById<Spinner>(R.id.themeSpinner)
+        val sharedPreferenceManger = SharedPreferenceManger(this)
+        var checkedTheme = sharedPreferenceManger.theme
+
+        // Set up adapter for spinner
+        val adapter = ArrayAdapter(
+            this,
+            android.R.layout.simple_spinner_dropdown_item,
+            themeTitleList
+        )
+        Log.d("spinner", "themeSpinner $themeSpinner")
+        Log.d("spinner", "adapter $adapter")
+        themeSpinner.adapter = adapter
+
+        // Set spinner to saved value
+        themeSpinner.setSelection(checkedTheme)
+
+        // Listen for user changes
+        themeSpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+            override fun onItemSelected(
+                parent: AdapterView<*>?,
+                view: android.view.View?,
+                position: Int,
+                id: Long
+            ) {
+                if (position != sharedPreferenceManger.theme) {
+                    sharedPreferenceManger.theme = position
+                    AppCompatDelegate.setDefaultNightMode(
+                        sharedPreferenceManger.themeFlag[position]
+                    )
+                    dialog.dismiss()
+                }
+            }
+
+            override fun onNothingSelected(parent: AdapterView<*>?) {}
+        }
+
         toggleInputBtn.setOnClickListener {
             currentInputMode = when (currentInputMode) {
                 InputMode.KEYBOARD -> InputMode.BUTTONS
@@ -505,40 +644,77 @@ class MainActivity : AppCompatActivity() {
         builder.setView(dialogView)
         val dialog = builder.create()
 
-        // Read the JSON file
-        val jsonString = readJsonFile("data", fileJsonNameGameHistoryBoard)
-        val jsonObject = JSONObject(jsonString)
-        val pastGames = jsonObject.getJSONObject("gameInfo").getJSONArray("pastGames")
-
-        // Parse JSON data
-        val gamesList = mutableListOf<PastGame>()
-        for (i in 0 until pastGames.length()) {
-            val game = pastGames.getJSONObject(i)
-            gamesList.add(
-                PastGame(
-                    sevenLetterWord = game.getString("sevenLetterWord"),
-                    date = game.getString("date"),
-                    totalWordsCouldGet = game.getInt("howManyTotalWordsCouldGet"),
-                    totalWordsGot = game.getInt("howManyTotalWordsGot")
-                )
-            )
-        }
-
-        // Set up RecyclerView
         val recyclerView = dialogView.findViewById<RecyclerView>(R.id.board_recycler_view)
-        recyclerView.layoutManager = LinearLayoutManager(this)
-        val adapter = PastGamesAdapter(gamesList)
-        recyclerView.adapter = adapter
+        val gamesList = dataManager.getPastGames()
 
-        // Handle the exit button
-        dialogView.findViewById<Button>(R.id.exit_button).setOnClickListener {
-            dialog.dismiss()
+        if (gamesList.isNotEmpty()) {
+            recyclerView.layoutManager = LinearLayoutManager(this)
+            recyclerView.adapter = PastGamesAdapter(gamesList)
+        } else {
+            recyclerView.visibility = View.GONE
+            val tv = TextView(this).apply {
+                text = "No past games yet. Play one and check back!"
+                textSize = 16f
+                setTextColor(ContextCompat.getColor(context, android.R.color.black))
+                setPadding(24, 24, 24, 24)
+            }
+            (recyclerView.parent as? ViewGroup)?.addView(tv)
         }
 
+        dialogView.findViewById<Button>(R.id.exit_button).setOnClickListener { dialog.dismiss() }
         dialog.show()
     }
 
-    //------------------------------------------------------------------------------------------------------------------------------
+    //------ words ------------------------------------------------------------------------------------------------------------------------
+
+    //------ from map
+    /**
+     * Returns all 2^n subsets of the given 7-letter word.
+     * - Each subset's letters are sorted alphabetically (e.g., "cba" -> "abc").
+     * - The list includes the empty string "" (for mask == 0), so you'll get 128 items for 7 letters.
+     * - If the word has repeated letters, some subset strings may be identical (kept as-is).
+     */
+    private fun allSortedSubsetsFast(): List<String> {
+        require(sevenLetterWord.length == 7) { "Word must be exactly 7 letters." }
+
+        // Sort the input once so any left-to-right selection yields a sorted subset
+        val sorted = sevenLetterWord.toCharArray().apply { sort() }
+        val subsetsList = ArrayList<String>(1 shl 7) // 128
+        val sb = StringBuilder(7)
+
+        for (mask in 0 until (1 shl 7)) { // 0..127
+            sb.setLength(0)
+            // Append characters in index order -> subset is already sorted
+            for (i in 0 until 7) {
+                if ((mask and (1 shl i)) != 0) sb.append(sorted[i])
+            }
+            subsetsList.add(sb.toString())
+        }
+        // Remove duplicates, keep first occurrence order
+        return subsetsList.distinct()
+    }
+
+    private fun organizeWordsListsFromMapIntoWordListsByLength(){
+        wordListsByLength.clear()
+        val subsetKeys = allSortedSubsetsFast()
+
+        for (key in subsetKeys) {
+            val words = allWordsMap[key] ?: continue  // skip if no words for this key
+            val length = key.length
+            for (word in words) {
+                wordListsByLength
+                    .getOrPut(length) { mutableListOf() }
+                    .add(WordEntry(word))
+            }
+        }
+
+        // ✅ Sort each list alphabetically
+        for ((_, list) in wordListsByLength) {
+            list.sortBy { it.word }
+        }
+    }
+
+    //------ from txt
 
     // Reads all lines from the word list file in assets
     private fun readWordsFromAssets(): List<String> {
@@ -549,32 +725,7 @@ class MainActivity : AppCompatActivity() {
 
     // Randomly selects a 7-letter word from the word list
     private fun selectRandomlyASevenLetterWordFromList(): String {
-        val words = readWordsFromAssets().filter { it.length == 7 }
-        return words[Random.nextInt(words.size)]
-    }
-
-    // Populates the word lists by length from the available words that can be formed from sevenLetterWord
-    private fun setupWordLists() {
-        wordListsByLength.clear()
-        val allWords = readWordsFromAssets()
-
-        for (word in allWords) {
-            if (canBeFormedFrom(word, sevenLetterWord)) {
-                val length = word.length
-                wordListsByLength.getOrPut(length) { mutableListOf() }.add(WordEntry(word))
-            }
-        }
-    }
-
-    // Checks if subWord can be formed from baseWord by comparing character counts
-    private fun canBeFormedFrom(subWord: String, baseWord: String): Boolean {
-        val baseCharCounts = baseWord.groupingBy { it }.eachCount().toMutableMap()
-        for (char in subWord) {
-            val count = baseCharCounts[char] ?: 0
-            if (count == 0) return false
-            baseCharCounts[char] = count - 1
-        }
-        return true
+        return listSevenLetterWords[Random.nextInt(listSevenLetterWords.size)]
     }
 
     //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -587,34 +738,6 @@ class MainActivity : AppCompatActivity() {
     // Shuffles the letters in a word and returns the shuffled string
     private fun shuffleWord(word: String): String {
         return " " + word.toList().shuffled().joinToString(" ")
-    }
-
-    // JSON
-    private fun readJsonFileFromAssets(folder: String, fileName: String): String {
-        val filePath = "$folder/$fileName"
-        return applicationContext.assets.open(filePath).bufferedReader().use { it.readText() }
-    }
-
-    private fun readJsonFile(folder: String, fileName: String): String {
-        val file = File(filesDir, "$folder/$fileName")
-        return if (file.exists()) {
-            file.readText()
-        } else {
-            "{}"  // Return empty JSON if file doesn't exist
-        }
-    }
-
-    private fun writeJsonToFile_old(folder: String, fileName: String, jsonString: String) {
-        val file = File(filesDir, "$folder/$fileName")
-        file.parentFile?.mkdirs() // Create directories if they don't exist
-        file.writeText(jsonString)
-    }
-
-    private fun writeJsonToFile(jsonString: String) {
-        val file = File(filesDir, "$foldernameWherefileJsonNameGameHistoryBoardIs/$fileJsonNameGameHistoryBoard")
-        file.parentFile?.mkdirs()
-        file.writeText(jsonString)
-        Log.d("FileWrite", "JSON saved to ${file.absolutePath}")
     }
 
 }

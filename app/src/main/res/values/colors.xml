@@ -6,6 +6,7 @@
     <!-- colors.xml -->
     <color name="guessed_word_color">#6B8F71</color>
     <color name="default_word_color">#000000</color>
+    <color name="input_text_background_normal">#80FFFFFF</color>
 
     <!-- Color Scheme 0: "Anagramama" -->
     <color name="temp1">#889AFA</color>

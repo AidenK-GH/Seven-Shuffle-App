@@ -1,12 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:name=".MyApp"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".MainActivity"
     android:orientation="vertical"
-    android:background="@color/Background_Garden"
+    style="@style/layoutStyleBackgoundColor"
     >
     <LinearLayout
         android:id="@+id/main"
@@ -14,62 +15,42 @@
         android:layout_height="match_parent"
         tools:context=".MainActivity"
         android:orientation="vertical"
-        android:background="@color/Background_Garden"
         >
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:layout_marginLeft="5dp"
-        android:layout_marginRight="5dp">
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
-            android:layout_margin="0dp">
+            android:gravity="center"
+            android:layout_marginLeft="5dp"
+            android:layout_marginRight="5dp">
             <Button
+                style="@style/buttonStyle"
                 android:id="@+id/new_game_btn"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_margin="5dp"
-                android:backgroundTint="@color/Buttons_Garden"
                 android:text="New Game"
-                android:textSize="18sp"
                 />
             <Button
                 android:id="@+id/solve_end_game_btn"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_margin="5dp"
-                android:backgroundTint="@color/Buttons_Garden"
+                style="@style/buttonStyle"
                 android:text="Solve"
-                android:textSize="18sp"
                 />
             <TextView
                 android:id="@+id/timer_textview"
                 android:text="00:00"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                style="@style/textViewWithBackgoundStyle"
                 android:textSize="20sp"
-                android:textStyle="bold"
-                android:layout_margin="5dp"
-                android:textColor="@color/Primary_Text_Garden"
-                android:background="@color/Accent_Garden"
                 />
 
             <Button
                 android:id="@+id/settings_btn"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_width="50dp"
+                android:layout_height="50dp"
                 android:layout_margin="5dp"
                 android:backgroundTint="@color/Buttons_Garden"
-                android:gravity="center"
                 android:drawableTop ="@drawable/round_build_24"
                 />
         </LinearLayout>
-    </LinearLayout>
-
+        
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -77,75 +58,68 @@
         android:layout_margin="5dp">
         <TextView
             android:id="@+id/letters_textview"
-            android:text=" T E X T E D I T"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:textSize="50sp"
-            android:textStyle="bold"
-            android:layout_margin="5dp"
-            android:textColor="@color/Primary_Text_Garden"
-            android:background="@color/Accent_Garden"
+            android:text="Press"
+            style="@style/textViewBIGWithBackgoundStyle"
             />
-
         <TextView
             android:id="@+id/userInput_Buttons_textview"
-            android:text=" B U T T O N S"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:textSize="50sp"
-            android:textStyle="bold"
-            android:layout_margin="5dp"
-            android:textColor="@color/Primary_Text_Garden"
-            android:background="@color/Accent_Garden"
+            android:text="New Game"
+            style="@style/textViewBIGWithBackgoundStyle"
             />
-
         <EditText
             android:id="@+id/userInput_EditText"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_margin="5dp"
-            android:background="@drawable/input_text_view_back"
+            style="@style/textViewBIGWithBackgoundStyle"
             android:digits=""
-            android:hint="Enter text here"
+            android:hint="New Game"
             android:maxLength="7"
-            android:textSize="50sp"
-            android:textStyle="bold" />
+            />
     </LinearLayout>
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
+        android:gravity="center"
         android:layout_marginLeft="5dp"
         android:layout_marginRight="5dp">
         <Button
-            android:id="@+id/check_btn"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_margin="5dp"
-            android:backgroundTint="@color/Buttons_Garden"
-            android:text="Check"
-            android:textSize="18sp"
+            android:id="@+id/shuffle_btn"
+            style="@style/buttonStyle"
+            android:text="Shuffle"
             />
         <Button
-            android:id="@+id/shuffle_btn"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_margin="5dp"
-            android:backgroundTint="@color/Buttons_Garden"
-            android:text="Shuffle"
-            android:textSize="18sp"
+            android:id="@+id/check_btn"
+            style="@style/buttonStyle"
+            android:text="Check"
+            android:textStyle="bold"
             />
+        <Button
+            android:id="@+id/clean_btn"
+            style="@style/buttonStyle"
+            android:text="Undo"
+            />
+    </LinearLayout>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:gravity="center"
+        android:layout_marginLeft="5dp"
+        android:layout_marginRight="5dp">
         <TextView
             android:id="@+id/checkInput_textview"
             android:text=""
+            style="@style/textViewWithBackgoundStyle"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:textSize="18sp"
-            android:textStyle="bold"
-            android:layout_margin="5dp"
-            android:background="@color/Accent_Garden"
-            android:textColor="@color/Primary_Text_Garden"
+            android:gravity="center"
+            android:visibility="gone"
+            />
+        <TextView
+            android:id="@+id/progressBar_textview"
+            android:text="CLICK 'NEW GAME' BUTTON TO START"
+            style="@style/textViewWithBackgoundStyle"
+            android:layout_width="match_parent"
+            android:gravity="center"
             />
     </LinearLayout>
 
@@ -155,7 +129,7 @@
         android:layout_height="wrap_content"
         android:orientation="vertical"
         android:gravity="center"
-        android:padding="16dp">
+        android:padding="5dp">
 
         <!-- First row: 4 buttons -->
         <LinearLayout
@@ -166,30 +140,18 @@
 
             <Button
                 android:id="@+id/input_1_btn"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_margin="5dp"
-                android:backgroundTint="@color/Buttons_Garden"
+                style="@style/buttonStyle"
                 android:text="X"
-                android:textSize="18sp"
                 />
             <Button
                 android:id="@+id/input_2_btn"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_margin="5dp"
-                android:backgroundTint="@color/Buttons_Garden"
+                style="@style/buttonStyle"
                 android:text="X"
-                android:textSize="18sp"
                 />
             <Button
                 android:id="@+id/input_3_btn"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_margin="5dp"
-                android:backgroundTint="@color/Buttons_Garden"
+                style="@style/buttonStyle"
                 android:text="X"
-                android:textSize="18sp"
                 />
 
         </LinearLayout>
@@ -203,30 +165,18 @@
 
             <Button
                 android:id="@+id/input_4_btn"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_margin="5dp"
-                android:backgroundTint="@color/Buttons_Garden"
+                style="@style/buttonStyle"
                 android:text="X"
-                android:textSize="18sp"
                 />
             <Button
                 android:id="@+id/input_5_btn"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_margin="5dp"
-                android:backgroundTint="@color/Buttons_Garden"
+                style="@style/buttonStyle"
                 android:text="X"
-                android:textSize="18sp"
                 />
             <Button
                 android:id="@+id/input_6_btn"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_margin="5dp"
-                android:backgroundTint="@color/Buttons_Garden"
+                style="@style/buttonStyle"
                 android:text="X"
-                android:textSize="18sp"
                 />
 
         </LinearLayout>
@@ -239,16 +189,11 @@
 
             <Button
                 android:id="@+id/input_7_btn"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_margin="5dp"
-                android:backgroundTint="@color/Buttons_Garden"
+                style="@style/buttonStyle"
                 android:text="X"
-                android:textSize="18sp"
                 />
         </LinearLayout>
     </LinearLayout>
-
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -259,12 +204,7 @@
         <TextView
         android:id="@+id/answers_textview"
         android:text="Answers:"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:textSize="18sp"
-        android:textStyle="bold"
-        android:layout_margin="5dp"
-            android:textColor="@color/Primary_Text_Garden"
+        style="@style/textViewStyle"
         />
         <LinearLayout
             android:layout_width="match_parent"
@@ -273,14 +213,10 @@
             android:layout_margin="10dp">
                 <TextView
                     android:id="@+id/answers_temp_textview"
+                    style="@style/textViewWithBackgoundStyle"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_margin="5dp"
                     android:text="CLICK 'NEW GAME' BUTTON TO START"
-                    android:textSize="18sp"
-                    android:background="@color/Accent_Garden"
-                    android:textColor="@color/Primary_Text_Garden"
-                    android:textStyle="bold" />
+                    />
         </LinearLayout>
         <LinearLayout
             android:layout_width="match_parent"
@@ -288,24 +224,15 @@
             android:orientation="horizontal">
             <Button
                 android:id="@+id/help_btn"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_margin="5dp"
-                android:backgroundTint="@color/Buttons_Garden"
+                style="@style/buttonStyle"
                 android:text="Help"
-                android:textSize="18sp"
                 />
             <Button
                 android:id="@+id/game_history_btn"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_margin="5dp"
-                android:backgroundTint="@color/Buttons_Garden"
+                style="@style/buttonStyle"
                 android:text="Past Games"
-                android:textSize="18sp"
                 />
         </LinearLayout>
-
 
     </LinearLayout>
 </LinearLayout>

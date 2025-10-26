@@ -4,11 +4,11 @@ plugins {
 }
 
 android {
-    namespace = "com.example.anagramarama_app"
+    namespace = "io.github.aidenk.sevenshuffle"
     compileSdk = 34
 
     defaultConfig {
-        applicationId = "com.example.anagramarama_app"
+        applicationId = "io.github.aidenk.sevenshuffle"
         minSdk = 23
         targetSdk = 34
         versionCode = 1

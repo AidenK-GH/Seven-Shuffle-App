@@ -140,7 +140,7 @@
                 android:layout_margin="5dp"
                 />
         </LinearLayout>
-        <com.example.anagramarama_app.MyKeyboard
+        <sevenshuffle.MyKeyboard
             android:id="@+id/keyboard"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

@@ -7,7 +7,7 @@
     android:padding="15dp"
     android:layout_margin="25dp"
     android:orientation="vertical"
-    android:background="@color/Background_Garden"
+    style="@style/layoutStyleBackgoundColor"
     >
     <LinearLayout
         android:layout_width="match_parent"
@@ -15,55 +15,41 @@
         android:orientation="horizontal"
         android:layout_margin="0dp">
         <TextView
+            style="@style/textViewStyle"
             android:text="Settings"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textSize="20sp"
-            android:textStyle="bold"
-            android:layout_margin="5dp"
-            android:textColor="@color/Primary_Text_Garden"
             />
         <Button
             android:id="@+id/exit_button"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:backgroundTint="@color/Buttons_Garden"
+            style="@style/buttonStyle"
             android:text="X" />
     </LinearLayout>
 
     <TextView
         android:text="Input Options:"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textSize="20sp"
-        android:textStyle="bold"
-        android:layout_margin="5dp"
-        android:textColor="@color/Primary_Text_Garden"
+        style="@style/textViewStyle"
         />
 
     <Button
         android:id="@+id/toggle_input_mode_btn"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_margin="8dp"
-        android:text="Switch Input Mode"
+        style="@style/buttonStyle"
+        android:text="Switch Input Mode between Buttons and Keyboard"
         />
 
     <TextView
-        android:text="Theme Colors:"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textSize="20sp"
-        android:textStyle="bold"
-        android:layout_margin="5dp"
-        android:textColor="@color/Primary_Text_Garden"
+        android:text="Theme:"
+        style="@style/textViewStyle"
         />
+
     <Spinner
         android:id="@+id/themeSpinner"
+        style="@style/spinnerStyle"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:entries="@array/theme_options"
-        android:background="@color/Buttons_Garden"
+        android:entries="@array/theme_options" />
+    <TextView
+        android:id="@+id/instractions_textview"
+        style="@style/textViewStyle"
+        android:text="@string/Instructions"
         />
 
 </LinearLayout>

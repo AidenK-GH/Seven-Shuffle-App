@@ -8,20 +8,18 @@
 
     <TextView
         android:id="@+id/date_text"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textStyle="bold"
-        android:textSize="16sp" />
+        style="@style/textViewPastGameStyle"
+        />
 
     <TextView
         android:id="@+id/word_text"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        style="@style/textViewPastGameStyle"
+        android:textStyle="normal"
         android:textSize="14sp" />
 
     <TextView
         android:id="@+id/progress_text"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        style="@style/textViewPastGameStyle"
+        android:textStyle="normal"
         android:textSize="14sp" />
 </LinearLayout>

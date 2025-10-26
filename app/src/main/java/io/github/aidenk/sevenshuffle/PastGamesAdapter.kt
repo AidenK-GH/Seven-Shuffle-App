@@ -1,11 +1,11 @@
-package com.example.anagramarama_app
+package io.github.aidenk.sevenshuffle
 
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
-import com.example.anagramarama_app.data.PastGame
+import io.github.aidenk.sevenshuffle.PastGame
 
 class PastGamesAdapter(private val gamesList: List<PastGame>) :
     RecyclerView.Adapter<PastGamesAdapter.ViewHolder>() {

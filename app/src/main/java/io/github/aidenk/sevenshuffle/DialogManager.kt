@@ -1,4 +1,4 @@
-package com.example.anagramarama_app
+package io.github.aidenk.sevenshuffle
 
 import android.content.Context
 import android.view.LayoutInflater
@@ -6,11 +6,6 @@ import android.widget.Button
 import androidx.appcompat.app.AlertDialog
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.example.anagramarama_app.R
-import com.example.anagramarama_app.data.PastGame
-import org.json.JSONObject
-
-//import com.example.anagramarama_app.data.PastGamesAdapter
 
 class DialogManager(private val context: Context) {
 

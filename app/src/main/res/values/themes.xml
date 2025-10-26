@@ -6,4 +6,74 @@
     </style>
 
     <style name="Theme.Anagramarama_App" parent="Base.Theme.Anagramarama_App" />
+
+    <style name="buttonStyle">
+        <item name="android:backgroundTint">@color/Buttons_Garden</item>
+        <item name="android:textColor">@color/white</item>
+        <item name="android:textSize">18sp</item>
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_margin">5sp</item>
+    </style>
+
+    <style name="textViewStyle">
+        <item name="android:textColor">@color/Primary_Text_Garden</item>
+        <item name="android:textSize">18sp</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_margin">5sp</item>
+    </style>
+    <style name="textViewWithBackgoundStyle">
+        <item name="android:background">@color/Accent_Garden</item>
+        <item name="android:textColor">@color/Primary_Text_Garden</item>
+        <item name="android:textSize">18sp</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_margin">5sp</item>
+    </style>
+    <style name="textViewBIGWithBackgoundStyle">
+        <item name="android:background">@color/Accent_Garden</item>
+        <item name="android:textColor">@color/Primary_Text_Garden</item>
+        <item name="android:textSize">50sp</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_margin">5sp</item>
+        <item name="android:gravity">center</item>
+    </style>
+
+    <style name="layoutStyleBackgoundColor">
+        <item name="android:background">@color/Background_Garden</item>
+    </style>
+
+    <style name="spinnerStyle">
+        <item name="android:background">@color/Accent_Garden</item>
+        <item name="android:textColor">@color/Primary_Text_Garden</item>
+        <item name="android:textSize">18sp</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_margin">5sp</item>
+    </style>
+
+    <style name="PastGamesSyle">
+        <item name="android:background">@color/Accent_Garden</item>
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">0dp</item>
+        <item name="android:layout_weight">1</item>
+        <item name="android:layout_marginTop">10dp</item>
+        <item name="android:padding">10dp</item>
+    </style>
+
+    <style name="textViewPastGameStyle">
+        <item name="android:textColor">@color/Primary_Text_Garden</item>
+        <item name="android:textSize">18sp</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_margin">5sp</item>
+    </style>
+
 </resources>

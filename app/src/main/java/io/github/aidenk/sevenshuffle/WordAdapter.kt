@@ -1,13 +1,12 @@
-package com.example.anagramarama_app
+package io.github.aidenk.sevenshuffle
 
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
-
+import io.github.aidenk.sevenshuffle.R
 //data class WordEntry(val word: String, var isGuessed: Boolean = false)
-import com.example.anagramarama_app.WordEntry
 
 class WordAdapter : RecyclerView.Adapter<WordAdapter.WordViewHolder>() {
 

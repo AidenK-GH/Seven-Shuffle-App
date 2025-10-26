@@ -1,4 +1,4 @@
-package com.example.anagramarama_app
+package io.github.sevenshuffle
 
 import org.junit.Test
 
