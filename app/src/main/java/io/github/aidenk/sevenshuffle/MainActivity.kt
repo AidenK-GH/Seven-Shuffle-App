@@ -2,6 +2,7 @@ package io.github.aidenk.sevenshuffle
 
 import android.animation.ArgbEvaluator
 import android.animation.ValueAnimator
+import android.annotation.SuppressLint
 import android.os.Bundle
 import android.os.CountDownTimer
 import android.text.Spannable
@@ -77,7 +78,7 @@ class MainActivity : AppCompatActivity() {
 
     // Timer setup for a 5-minute countdown
     private lateinit var gameTimer: CountDownTimer
-    private val gameDurationInMillis: Long = 5 * 60 * 1000
+    private val gameDurationInMillis: Long = 10 * 60 * 1000
 
     // animation fade color speed
     private val fadeColorSpeedMS: Long = 1000
@@ -568,6 +569,14 @@ class MainActivity : AppCompatActivity() {
 
         val dialog = builder.create()
         dialogView.findViewById<Button>(R.id.exit_button).setOnClickListener { dialog.dismiss() }
+
+        val linkTextView = dialogView.findViewById<TextView?>(R.id.github_textview)
+        linkTextView?.apply {
+            text = "https://github.com/AidenK-GH/Seven-Shuffle-App/tree/master"
+            linksClickable = true
+            movementMethod = android.text.method.LinkMovementMethod.getInstance()
+        }
+
         dialog.show()
     }
 
@@ -632,7 +641,7 @@ class MainActivity : AppCompatActivity() {
                 InputMode.BUTTONS -> InputMode.KEYBOARD
             }
             dialog.dismiss()
-            updateInputModeUI()  // ⬅️ This applies the visual change after dialog closes
+            updateInputModeUI()  // This applies the visual change after dialog closes
         }
 
         dialog.show()
@@ -708,7 +717,7 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
-        // ✅ Sort each list alphabetically
+        // Sort each list alphabetically
         for ((_, list) in wordListsByLength) {
             list.sortBy { it.word }
         }

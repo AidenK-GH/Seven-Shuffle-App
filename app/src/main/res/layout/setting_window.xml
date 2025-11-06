@@ -46,6 +46,12 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:entries="@array/theme_options" />
+
+    <TextView
+        android:text="Changing the theme will make the game restart."
+        style="@style/textViewStyle"
+        />
+
     <TextView
         android:id="@+id/instractions_textview"
         style="@style/textViewStyle"

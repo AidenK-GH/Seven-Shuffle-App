@@ -1,7 +1,7 @@
 <resources>
     <string name="app_name">Seven Shuffle</string>
     <string name="Instructions"> Seven Shuffle is a game. The goal is to guess as many anagrams as possible, given a set of characters. \n
- An anagram is a word or phrase formed by rearranging the letters of a different word or phrase, typically using all the original letters exactly once.
+ An anagram is a word or phrase formed by rearranging the letters of a different word or phrase, in this game you use between 3 to 7 of the original letters.
  </string>
     <string name="Theme_Change">Heads up! Changing the theme will end any game that’s currently playing. Make sure to finish your game first.</string>
     <string name="copyright_info">Copyright info - \n
