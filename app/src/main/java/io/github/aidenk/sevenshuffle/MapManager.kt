@@ -3,6 +3,8 @@ package io.github.aidenk.sevenshuffle
 import android.content.Context
 import org.json.JSONObject
 import java.io.BufferedReader
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 
 object MapManager {
 
@@ -11,16 +13,24 @@ object MapManager {
     private val fileNameJSONAllWordMap = "all_word_map.json"
 
     private lateinit var ver_context: Context
-
+    @Volatile var isLoaded: Boolean = false
     // map that keeps the Library of all the words. key is the letters that used to make words in value:list.
     @Volatile lateinit var allWordsMap: MutableMap<String, List<String>>
     // list of all 7 letter words. faster than reading asset file everytime.
     @Volatile lateinit var listSevenLetterWords: List<String>
 
-    fun startLoad(context: Context){
+    /** Does heavy I/O off the main thread, returns only when data is ready. */
+    suspend fun startLoad(context: Context) {
         ver_context = context
-        allWordsMap = loadAllWordMapFromAssets()
-        listSevenLetterWords = readWordsFromAssets().filter { it.length == 7 };
+        if (isLoaded) return
+        val (map, sevens) = withContext(Dispatchers.IO) {
+            val map = loadAllWordMapFromAssets()
+            val allWords = readWordsFromAssets()
+            map to allWords.filter { it.length == 7 }
+        }
+        allWordsMap = map
+        listSevenLetterWords = sevens
+        isLoaded = true
     }
 
     private fun loadAllWordMapFromAssets(): MutableMap<String, List<String>> {

@@ -1,41 +1,48 @@
 package io.github.aidenk.sevenshuffle
 
+import android.app.AlertDialog
+import android.content.DialogInterface
 import android.content.Intent
 import android.os.Bundle
-import android.os.Handler
-import android.os.Looper
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.view.ViewCompat
-import androidx.core.view.WindowInsetsCompat
+import androidx.lifecycle.lifecycleScope
+import kotlinx.coroutines.launch
+
 
 class Splash : AppCompatActivity() {
-
-    private val handler = Handler(Looper.getMainLooper())
-    private val goToMain = Runnable {
-        startActivity(Intent(this, MainActivity::class.java))
-        finish()
-    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContentView(R.layout.activity_splash)
 
-        MapManager.startLoad(this)
-
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
-            val sys = insets.getInsets(WindowInsetsCompat.Type.systemBars())
-            v.setPadding(sys.left, sys.top, sys.right, sys.bottom)
-            insets
+        //MapManager.startLoad(this)
+        lifecycleScope.launch {
+            try {
+                // Suspends until startLoad completes
+                MapManager.startLoad(this@Splash)
+                goToMain()
+            } catch (e: Exception) {
+                // TODO show a simple error/retry if you want
+                MapManager.isLoaded = false
+                val alertDialog = AlertDialog.Builder(this@Splash).create()
+                alertDialog.setTitle("Alert")
+                alertDialog.setMessage("Alert message to be shown")
+                alertDialog.setButton(
+                    AlertDialog.BUTTON_NEUTRAL, "OK",
+                    object : DialogInterface.OnClickListener {
+                        override fun onClick(dialog: DialogInterface, which: Int) {
+                            dialog.dismiss()
+                        }
+                    })
+                alertDialog.show()
+            }
         }
-
-        // instead of 1000L we need to wait for MapManager.startLoad(this) to finish and only then go to main
-        handler.postDelayed(goToMain, 1000L) // 2 seconds
     }
 
-    override fun onDestroy() {
-        handler.removeCallbacks(goToMain)
-        super.onDestroy()
+    private fun goToMain() {
+        startActivity(Intent(this, MainActivity::class.java))
+        finish()
     }
 }
