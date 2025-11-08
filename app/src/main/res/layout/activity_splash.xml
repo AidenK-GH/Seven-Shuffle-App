@@ -5,7 +5,33 @@
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/ic_launcher_7_foreground"
+    android:background="@drawable/background_layout_gradient"
     tools:context=".Splash">
+
+    <ImageView
+        android:id="@+id/imageView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="center"
+        android:src="@drawable/ic_launcher_7_foreground" />
+
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:orientation="vertical"
+        app:layout_constraintBottom_toBottomOf="@+id/imageView"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        android:paddingBottom="20dp"
+        >
+
+        <TextView
+            style="@style/textViewStyle"
+            android:gravity="center"
+            android:text="Dedicated to my father." />
+
+    </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

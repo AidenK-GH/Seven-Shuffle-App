@@ -2,6 +2,7 @@
 <resources>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
+    <color name="gray">#80FFFFFF</color>
 
     <!-- colors.xml -->
     <color name="guessed_word_color">#6B8F71</color>
@@ -23,7 +24,9 @@
     <color name="Primary_Text_Garden">#264E36</color>
     <color name="Secondary_Text_Garden">#6B8F71</color>
     <color name="Highlight_Selection_Garden">#FFD23F</color>
+    <color name="Highlight_Selection_Garden_Opacity">#fff4cf</color>
     <color name="Buttons_Garden">#FF6F59</color>
+    <color name="Buttons_Garden_lighter">#FF806C</color>
     <color name="Accent_Garden">#FFE5E0</color>
 
     <!-- button colors -->

@@ -7,7 +7,7 @@
     android:layout_height="match_parent"
     tools:context=".MainActivity"
     android:orientation="vertical"
-    style="@style/layoutStyleBackgoundColor"
+    style="@style/layoutStyleBackgroundColor"
     >
     <LinearLayout
         android:id="@+id/main"
@@ -37,7 +37,7 @@
             <TextView
                 android:id="@+id/timer_textview"
                 android:text="00:00"
-                style="@style/textViewWithBackgoundStyle"
+                style="@style/textViewWithBackgroundStyle"
                 android:textSize="20sp"
                 />
 
@@ -48,6 +48,7 @@
                 android:layout_margin="5dp"
                 android:backgroundTint="@color/Buttons_Garden"
                 android:drawableTop ="@drawable/round_build_24"
+                style="iconButtonStyle"
                 />
         </LinearLayout>
         
@@ -59,16 +60,17 @@
         <TextView
             android:id="@+id/letters_textview"
             android:text="Press"
-            style="@style/textViewBIGWithBackgoundStyle"
+            style="@style/textViewBIGWithBackgroundStyle"
+            android:background="@android:color/transparent"
             />
         <TextView
             android:id="@+id/userInput_Buttons_textview"
             android:text="New Game"
-            style="@style/textViewBIGWithBackgoundStyle"
+            style="@style/textViewBIGWithBackgroundStyle"
             />
         <EditText
             android:id="@+id/userInput_EditText"
-            style="@style/textViewBIGWithBackgoundStyle"
+            style="@style/textViewBIGWithBackgroundStyle"
             android:digits=""
             android:hint="New Game"
             android:maxLength="7"
@@ -109,7 +111,7 @@
         <TextView
             android:id="@+id/checkInput_textview"
             android:text=""
-            style="@style/textViewWithBackgoundStyle"
+            style="@style/textViewWithBackgroundStyle"
             android:layout_width="match_parent"
             android:gravity="center"
             android:visibility="gone"
@@ -117,7 +119,7 @@
         <TextView
             android:id="@+id/progressBar_textview"
             android:text="CLICK 'NEW GAME' BUTTON TO START"
-            style="@style/textViewWithBackgoundStyle"
+            style="@style/textViewWithBackgroundStyle"
             android:layout_width="match_parent"
             android:gravity="center"
             />
@@ -140,17 +142,17 @@
 
             <Button
                 android:id="@+id/input_1_btn"
-                style="@style/buttonStyle"
+                style="@style/inputButtonStyle"
                 android:text="X"
                 />
             <Button
                 android:id="@+id/input_2_btn"
-                style="@style/buttonStyle"
+                style="@style/inputButtonStyle"
                 android:text="X"
                 />
             <Button
                 android:id="@+id/input_3_btn"
-                style="@style/buttonStyle"
+                style="@style/inputButtonStyle"
                 android:text="X"
                 />
 
@@ -165,17 +167,17 @@
 
             <Button
                 android:id="@+id/input_4_btn"
-                style="@style/buttonStyle"
+                style="@style/inputButtonStyle"
                 android:text="X"
                 />
             <Button
                 android:id="@+id/input_5_btn"
-                style="@style/buttonStyle"
+                style="@style/inputButtonStyle"
                 android:text="X"
                 />
             <Button
                 android:id="@+id/input_6_btn"
-                style="@style/buttonStyle"
+                style="@style/inputButtonStyle"
                 android:text="X"
                 />
 
@@ -189,7 +191,7 @@
 
             <Button
                 android:id="@+id/input_7_btn"
-                style="@style/buttonStyle"
+                style="@style/inputButtonStyle"
                 android:text="X"
                 />
         </LinearLayout>
@@ -213,7 +215,7 @@
             android:layout_margin="10dp">
                 <TextView
                     android:id="@+id/answers_temp_textview"
-                    style="@style/textViewWithBackgoundStyle"
+                    style="@style/textViewWithBackgroundStyle"
                     android:layout_width="match_parent"
                     android:text="CLICK 'NEW GAME' BUTTON TO START"
                     />
@@ -232,6 +234,7 @@
                 style="@style/buttonStyle"
                 android:text="Past Games"
                 />
+
         </LinearLayout>
 
     </LinearLayout>

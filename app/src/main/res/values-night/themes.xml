@@ -13,6 +13,18 @@
         <item name="android:layout_height">wrap_content</item>
         <item name="android:layout_margin">5sp</item>
     </style>
+    <style name="inputButtonStyle">
+        <item name="android:backgroundTint">@color/Accent_Garden</item>
+        <item name="android:textColor">@color/Buttons_Garden</item>
+        <item name="android:textSize">18sp</item>
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_margin">5sp</item>
+    </style>
+    <style name="iconButtonStyle">
+        <item name="android:backgroundTint">@color/Accent_Garden</item>
+        <item name="android:background">@color/Accent_Garden</item>
+    </style>
 
     <style name="textViewStyle">
         <item name="android:textColor">@color/Accent_Garden</item>
@@ -22,8 +34,8 @@
         <item name="android:layout_height">wrap_content</item>
         <item name="android:layout_margin">5sp</item>
     </style>
-    <style name="textViewWithBackgoundStyle">
-        <item name="android:background">@color/Primary_Text_Garden</item>
+    <style name="textViewWithBackgroundStyle">
+        <item name="android:background">@null</item>
         <item name="android:textColor">@color/Accent_Garden</item>
         <item name="android:textSize">18sp</item>
         <item name="android:textStyle">bold</item>
@@ -31,7 +43,7 @@
         <item name="android:layout_height">wrap_content</item>
         <item name="android:layout_margin">5sp</item>
     </style>
-    <style name="textViewBIGWithBackgoundStyle">
+    <style name="textViewBIGWithBackgroundStyle">
         <item name="android:background">@color/Primary_Text_Garden</item>
         <item name="android:textColor">@color/Accent_Garden</item>
         <item name="android:textSize">50sp</item>
@@ -42,8 +54,8 @@
         <item name="android:gravity">center</item>
     </style>
 
-    <style name="layoutStyleBackgoundColor">
-        <item name="android:background">@color/Secondary_Text_Garden</item>
+    <style name="layoutStyleBackgroundColor">
+        <item name="android:background">@drawable/background_layout_gradient_dark</item>
     </style>
 
     <style name="spinnerStyle">
@@ -56,7 +68,7 @@
         <item name="android:layout_margin">5sp</item>
     </style>
 
-    <style name="PastGamesSyle">
+    <style name="PastGamesStyle">
         <item name="android:background">@color/Primary_Text_Garden</item>
         <item name="android:layout_width">match_parent</item>
         <item name="android:layout_height">0dp</item>

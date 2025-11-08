@@ -7,27 +7,33 @@
     android:padding="15dp"
     android:layout_margin="25dp"
     android:orientation="vertical"
-    style="@style/layoutStyleBackgoundColor"
+    style="@style/layoutStyleBackgroundColor"
     >
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
+        android:gravity="center_vertical"
         android:layout_margin="0dp">
+
         <TextView
-            android:text="Past Games"
             style="@style/textViewStyle"
-            />
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Past Games" />
+
         <Button
             android:id="@+id/exit_button"
             style="@style/buttonStyle"
-            android:text="X"
-            />
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="X" />
     </LinearLayout>
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/board_recycler_view"
-        style="@style/PastGamesSyle"
+        style="@style/PastGamesStyle"
         />
 
 </LinearLayout>

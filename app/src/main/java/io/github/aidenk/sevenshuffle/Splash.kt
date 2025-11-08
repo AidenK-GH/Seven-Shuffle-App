@@ -22,12 +22,15 @@ class Splash : AppCompatActivity() {
         enableEdgeToEdge()
         setContentView(R.layout.activity_splash)
 
+        MapManager.startLoad(this)
+
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
             val sys = insets.getInsets(WindowInsetsCompat.Type.systemBars())
             v.setPadding(sys.left, sys.top, sys.right, sys.bottom)
             insets
         }
 
+        // instead of 1000L we need to wait for MapManager.startLoad(this) to finish and only then go to main
         handler.postDelayed(goToMain, 1000L) // 2 seconds
     }
 

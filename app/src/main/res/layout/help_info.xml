@@ -5,15 +5,31 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_margin="25dp"
-    style="@style/layoutStyleBackgoundColor"
+    style="@style/layoutStyleBackgroundColor"
     android:orientation="vertical"
     android:padding="15dp">
 
-    <Button
-        android:id="@+id/exit_button"
-        style="@style/buttonStyle"
-        android:layout_gravity="right"
-        android:text="X" />
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:layout_margin="0dp">
+
+        <TextView
+            style="@style/textViewStyle"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Help" />
+
+        <Button
+            android:id="@+id/exit_button"
+            style="@style/buttonStyle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="X" />
+    </LinearLayout>
 
     <TextView
         android:id="@+id/instractions_textview"

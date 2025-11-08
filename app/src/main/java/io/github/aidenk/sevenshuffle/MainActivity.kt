@@ -2,7 +2,6 @@ package io.github.aidenk.sevenshuffle
 
 import android.animation.ArgbEvaluator
 import android.animation.ValueAnimator
-import android.annotation.SuppressLint
 import android.os.Bundle
 import android.os.CountDownTimer
 import android.text.Spannable
@@ -27,7 +26,6 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import org.json.JSONObject
 import java.io.BufferedReader
-import java.io.File
 import kotlin.random.Random
 import android.content.res.Configuration
 
@@ -51,7 +49,7 @@ class MainActivity : AppCompatActivity() {
     // Data structure to store words categorized by their length
     private val wordListsByLength: MutableMap<Int, MutableList<WordEntry>> = mutableMapOf() // keeps the words for current game
     private lateinit var sevenLetterWord: String // 7 letter word of the current game
-    private val allWordsMap: MutableMap<String, List<String>> = mutableMapOf()
+    private lateinit var allWordsMap: MutableMap<String, List<String>>
     // ^ map that keeps the Library of all the words. key is the letters that used to make words in value:list.
     private lateinit var listSevenLetterWords: List<String> // list of all 7 letter words. faster than reading asset file everytime.
 
@@ -94,8 +92,10 @@ class MainActivity : AppCompatActivity() {
         dataManager = DataManager(this)
 
         // Initialize data structure
-        allWordsMap.putAll(loadAllWordMapFromAssets())
-        listSevenLetterWords = readWordsFromAssets().filter { it.length == 7 };
+        //allWordsMap.putAll(loadAllWordMapFromAssets())
+        //listSevenLetterWords = readWordsFromAssets().filter { it.length == 7 };
+        allWordsMap = MapManager.allWordsMap
+        listSevenLetterWords = MapManager.listSevenLetterWords
 
         // Initialize UI elements
         lettersTextView = findViewById(R.id.letters_textview)
