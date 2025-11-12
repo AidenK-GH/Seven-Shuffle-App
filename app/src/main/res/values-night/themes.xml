@@ -6,10 +6,22 @@
     </style>
 
     <style name="buttonStyle">
-        <item name="android:backgroundTint">@color/Accent_Garden</item>
+        <item name="android:background">@drawable/button_background_gradient_border_dark</item>
+        <item name="android:backgroundTint">@null</item>
+        <item name="backgroundTint">@null</item>
         <item name="android:textColor">@color/Buttons_Garden</item>
         <item name="android:textSize">18sp</item>
         <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_margin">5sp</item>
+    </style>
+    <style name="buttonMenuStyle">
+        <item name="android:background">@drawable/button_background_gradient_border_dark</item>
+        <item name="android:backgroundTint">@null</item>
+        <item name="backgroundTint">@null</item>
+        <item name="android:textColor">@color/Buttons_Garden</item>
+        <item name="android:textSize">30sp</item>
+        <item name="android:layout_width">300dp</item>
         <item name="android:layout_height">wrap_content</item>
         <item name="android:layout_margin">5sp</item>
     </style>
@@ -17,7 +29,7 @@
         <item name="android:backgroundTint">@color/Accent_Garden</item>
         <item name="android:textColor">@color/Buttons_Garden</item>
         <item name="android:textSize">18sp</item>
-        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_width">match_parent</item>
         <item name="android:layout_height">wrap_content</item>
         <item name="android:layout_margin">5sp</item>
     </style>

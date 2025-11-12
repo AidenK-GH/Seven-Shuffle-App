@@ -9,7 +9,6 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import kotlinx.coroutines.launch
 
-
 class Splash : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -17,18 +16,18 @@ class Splash : AppCompatActivity() {
         enableEdgeToEdge()
         setContentView(R.layout.activity_splash)
 
-        //MapManager.startLoad(this)
         lifecycleScope.launch {
             try {
                 // Suspends until startLoad completes
                 MapManager.startLoad(this@Splash)
                 goToMain()
             } catch (e: Exception) {
-                // TODO show a simple error/retry if you want
                 MapManager.isLoaded = false
                 val alertDialog = AlertDialog.Builder(this@Splash).create()
                 alertDialog.setTitle("Alert")
-                alertDialog.setMessage("Alert message to be shown")
+                alertDialog.setMessage("Apologizes but something went wrong. " +
+                        "Please write a comment in the github with as much detail as possible so it can be fixed. " +
+                        "GitHub: github.com/AidenK-GH/Seven-Shuffle-App")
                 alertDialog.setButton(
                     AlertDialog.BUTTON_NEUTRAL, "OK",
                     object : DialogInterface.OnClickListener {

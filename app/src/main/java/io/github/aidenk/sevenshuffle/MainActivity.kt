@@ -55,24 +55,25 @@ class MainActivity : AppCompatActivity() {
 
     private val userInputSequence = mutableListOf<Pair<Button, Char>>()
     private lateinit var letterButtons: List<Button>
+    private lateinit var pbLenTextViewList: List<TextView>
 
     // UI elements
     private lateinit var userInputButtonsTextView: TextView
     private lateinit var lettersTextView: TextView
     private lateinit var answersTempTextView: TextView
-    private lateinit var progressBarTextview: TextView
     private lateinit var newGameBtn: Button
     private lateinit var solveEndGameBtn: Button
     private lateinit var shuffleBtn: Button
     private lateinit var cleanBtn: Button
     private lateinit var checkBtn: Button
-    private lateinit var helpBtn: Button
-    private lateinit var gameHistoryBtn: Button
-    private lateinit var settingsBtn: Button
+    //private lateinit var helpBtn: Button
+    //private lateinit var gameHistoryBtn: Button
+    //private lateinit var settingsBtn: Button
     private lateinit var userInputEditText: EditText
     private lateinit var checkInputTextView: TextView
     private lateinit var timerTextView: TextView
     private lateinit var inputLayout2Layout: LinearLayout
+    private lateinit var progressBarTextview: TextView
 
     // Timer setup for a 5-minute countdown
     private lateinit var gameTimer: CountDownTimer
@@ -89,7 +90,7 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
 
         // Managers
-        dataManager = DataManager(this)
+        dataManager = (application as MyApp).dataManager //DataManager(this)
 
         // Initialize data structure
         //allWordsMap.putAll(loadAllWordMapFromAssets())
@@ -100,19 +101,27 @@ class MainActivity : AppCompatActivity() {
         // Initialize UI elements
         lettersTextView = findViewById(R.id.letters_textview)
         answersTempTextView = findViewById(R.id.answers_temp_textview)
-        progressBarTextview = findViewById(R.id.progressBar_textview)
         newGameBtn = findViewById(R.id.new_game_btn)
         solveEndGameBtn = findViewById(R.id.solve_end_game_btn)
         shuffleBtn = findViewById(R.id.shuffle_btn)
         cleanBtn = findViewById(R.id.clean_btn)
         checkBtn = findViewById(R.id.check_btn)
-        helpBtn = findViewById(R.id.help_btn)
-        gameHistoryBtn = findViewById(R.id.game_history_btn)
-        settingsBtn = findViewById(R.id.settings_btn)
+        //helpBtn = findViewById(R.id.help_btn)
+        //gameHistoryBtn = findViewById(R.id.game_history_btn)
+        //settingsBtn = findViewById(R.id.settings_btn)
         userInputEditText = findViewById(R.id.userInput_EditText)
         checkInputTextView = findViewById(R.id.checkInput_textview)
         timerTextView = findViewById(R.id.timer_textview)
         inputLayout2Layout = findViewById(R.id.input_type_2_layout)
+
+        progressBarTextview = findViewById(R.id.progressBar_textview)
+        pbLenTextViewList = listOf(
+            findViewById(R.id.pb_len3),
+            findViewById(R.id.pb_len4),
+            findViewById(R.id.pb_len5),
+            findViewById(R.id.pb_len6),
+            findViewById(R.id.pb_len7)
+        )
 
         userInputButtonsTextView = findViewById(R.id.userInput_Buttons_textview)
         letterButtons = listOf(
@@ -127,6 +136,7 @@ class MainActivity : AppCompatActivity() {
 
         setupTimer()
         updateInputModeUI()
+        disableAllControlsExceptNewGame()
 
         // Set up button actions
         newGameBtn.setOnClickListener {
@@ -137,6 +147,7 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
+        /*
         helpBtn.setOnClickListener {
             showHelpDialog()
         }
@@ -148,7 +159,7 @@ class MainActivity : AppCompatActivity() {
         settingsBtn.setOnClickListener {
             showSettingsDialog()
         }
-
+        */
         shuffleBtn.setOnClickListener {
             if (isThereAGameCurrentlyRunning) {
                 lettersTextView.text = shuffleWord(sevenLetterWord)
@@ -190,10 +201,12 @@ class MainActivity : AppCompatActivity() {
         updateAnswersTempTextView()
 
         userInputSequence.clear()
+        enableGameControls()
         updateUserInputFieldFromButtons()
         updateInputModeUI()
 
         val dumySevenLetterWord = sevenLetterWord.toList().shuffled().joinToString("")
+
         letterButtons.forEachIndexed { index, button ->
             val letter = dumySevenLetterWord[index]
             button.text = letter.toString()
@@ -207,11 +220,14 @@ class MainActivity : AppCompatActivity() {
                     userInputSequence.add(button to letter)
                     button.isSelected = true
                     tintInputButton(button)
-                } else {
-                    userInputSequence.removeAt(existingIndex)
-                    button.isSelected = false
-                    tintInputButton(button)
                 }
+                // this code would allow user if a button is selected, clicking on it again makes it remove from the input
+                // dad didn't like it, so removed
+//                else {
+//                    userInputSequence.removeAt(existingIndex)
+//                    button.isSelected = false
+//                    tintInputButton(button)
+//                }
 
                 updateUserInputFieldFromButtons()
             }
@@ -413,6 +429,7 @@ class MainActivity : AppCompatActivity() {
     private fun updateAnswersTempTextView() {
         val spannableBuilder = SpannableStringBuilder()
         var textForProgressBar = ""
+        var indexPbLenTextViewList = 0
 
         wordListsByLength.keys.sorted().forEach { length ->
             val words = wordListsByLength[length] ?: emptyList()
@@ -422,6 +439,8 @@ class MainActivity : AppCompatActivity() {
             // Add header with count
             spannableBuilder.append("$length-letter words ($guessedWordsCount / $totalWords):\n")
             textForProgressBar += "$length($guessedWordsCount/$totalWords) "
+            pbLenTextViewList[indexPbLenTextViewList].text = "$length($guessedWordsCount/$totalWords)"
+            indexPbLenTextViewList++
 
             // Add words with color
             words.forEachIndexed { index, wordEntry ->
@@ -461,6 +480,7 @@ class MainActivity : AppCompatActivity() {
         gameTimer.cancel()
 
         resetButtons()
+        disableAllControlsExceptNewGame()
 
         val spannableBuilder = SpannableStringBuilder()
 
@@ -479,7 +499,7 @@ class MainActivity : AppCompatActivity() {
 
                 // Set color only for guessed words
                 if (wordEntry.isGuessed) {
-                    val color = ContextCompat.getColor(answersTempTextView.context, R.color.guessed_word_color)
+                    val color = ContextCompat.getColor(answersTempTextView.context, R.color.default_button_color)
                     spannableBuilder.setSpan(
                         ForegroundColorSpan(color),
                         start,
@@ -561,6 +581,7 @@ class MainActivity : AppCompatActivity() {
         dialog.show()
     }
 
+    /*
     // Shows a dialog
     private fun showHelpDialog() {
         val builder = AlertDialog.Builder(this)
@@ -673,7 +694,7 @@ class MainActivity : AppCompatActivity() {
         dialogView.findViewById<Button>(R.id.exit_button).setOnClickListener { dialog.dismiss() }
         dialog.show()
     }
-
+    */
     //------ words ------------------------------------------------------------------------------------------------------------------------
 
     //------ from map
@@ -747,6 +768,64 @@ class MainActivity : AppCompatActivity() {
     // Shuffles the letters in a word and returns the shuffled string
     private fun shuffleWord(word: String): String {
         return " " + word.toList().shuffled().joinToString(" ")
+    }
+
+    // -----------------------------------------------------------------
+    // Enables all in-game controls (letters + action buttons)
+    // and leaves "New Game" enabled as well.
+    private fun enableGameControls() {
+        // Action buttons used during a game
+        val actionButtons = listOf(
+            solveEndGameBtn, shuffleBtn, cleanBtn, checkBtn
+            //,helpBtn, gameHistoryBtn, settingsBtn
+        )
+
+        // Enable action buttons
+        actionButtons.forEach { btn ->
+            btn.isEnabled = true
+            btn.alpha = 1f
+        }
+
+        // Enable letter buttons
+        letterButtons.forEach { btn ->
+            btn.isEnabled = true
+            btn.alpha = 1f
+        }
+
+        // Input widgets follow your current input mode
+        updateInputModeUI()
+
+        // Always keep New Game enabled/visible
+        newGameBtn.isEnabled = true
+        newGameBtn.alpha = 1f
+    }
+
+    // Disables everything except "New Game" (and the Android Back remains as usual)
+    private fun disableAllControlsExceptNewGame() {
+        val actionButtons = listOf(
+            solveEndGameBtn, shuffleBtn, cleanBtn, checkBtn
+            //,helpBtn, gameHistoryBtn, settingsBtn
+        )
+
+        // Disable action buttons
+        actionButtons.forEach { btn ->
+            btn.isEnabled = false
+            btn.alpha = 0.5f
+        }
+
+        // Disable letter buttons
+        letterButtons.forEach { btn ->
+            btn.isEnabled = false
+            btn.alpha = 0.5f
+        }
+
+        // Disable text input regardless of mode
+        userInputEditText.isEnabled = false
+        userInputButtonsTextView.isEnabled = false
+
+        // Keep New Game active
+        newGameBtn.isEnabled = true
+        newGameBtn.alpha = 1f
     }
 
 }

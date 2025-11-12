@@ -21,9 +21,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
-            android:gravity="center"
-            android:layout_marginLeft="5dp"
-            android:layout_marginRight="5dp">
+            android:gravity="center">
             <Button
                 style="@style/buttonStyle"
                 android:id="@+id/new_game_btn"
@@ -39,17 +37,18 @@
                 android:text="00:00"
                 style="@style/textViewWithBackgroundStyle"
                 android:textSize="20sp"
+                android:layout_width="wrap_content"
+                android:gravity="center"
+                android:layout_weight="1"
                 />
-
             <Button
-                android:id="@+id/settings_btn"
+                android:id="@+id/back_to_menu_button"
                 android:layout_width="50dp"
-                android:layout_height="50dp"
+                android:layout_height="45dp"
                 android:layout_margin="5dp"
                 android:backgroundTint="@color/Buttons_Garden"
-                android:drawableTop ="@drawable/round_build_24"
-                style="iconButtonStyle"
-                />
+                android:drawableTop ="@drawable/rounded_arrow_back_24"
+                style="iconButtonStyle" />
         </LinearLayout>
         
     <LinearLayout
@@ -88,17 +87,23 @@
             android:id="@+id/shuffle_btn"
             style="@style/buttonStyle"
             android:text="Shuffle"
+            android:layout_weight="1"
+            android:gravity="center"
             />
         <Button
             android:id="@+id/check_btn"
             style="@style/buttonStyle"
             android:text="Check"
             android:textStyle="bold"
+            android:layout_weight="1"
+            android:gravity="center"
             />
         <Button
             android:id="@+id/clean_btn"
             style="@style/buttonStyle"
-            android:text="Undo"
+            android:text="Delete"
+            android:layout_weight="1"
+            android:gravity="center"
             />
     </LinearLayout>
     <LinearLayout
@@ -122,24 +127,78 @@
             style="@style/textViewWithBackgroundStyle"
             android:layout_width="match_parent"
             android:gravity="center"
+            android:visibility="gone"
             />
     </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/progressBar_container"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:weightSum="5"
+            android:paddingHorizontal="8dp">
+
+            <TextView
+                android:id="@+id/pb_len3"
+                style="@style/textViewWithBackgroundStyle"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:text="3(0/0)"/>
+
+            <TextView
+                android:id="@+id/pb_len4"
+                style="@style/textViewWithBackgroundStyle"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:text="4(0/0)"/>
+
+            <TextView
+                android:id="@+id/pb_len5"
+                style="@style/textViewWithBackgroundStyle"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:text="5(0/0)"/>
+
+            <TextView
+                android:id="@+id/pb_len6"
+                style="@style/textViewWithBackgroundStyle"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:text="6(0/0)"/>
+
+            <TextView
+                android:id="@+id/pb_len7"
+                style="@style/textViewWithBackgroundStyle"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:text="7(0/0)"/>
+        </LinearLayout>
 
     <LinearLayout
         android:id="@+id/input_type_2_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
+        android:orientation="horizontal"
         android:gravity="center"
         android:padding="5dp">
 
-        <!-- First row: 4 buttons -->
         <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
+            android:orientation="vertical"
+            android:layout_weight="1"
             android:gravity="center">
-
             <Button
                 android:id="@+id/input_1_btn"
                 style="@style/inputButtonStyle"
@@ -150,28 +209,43 @@
                 style="@style/inputButtonStyle"
                 android:text="X"
                 />
+        </LinearLayout>
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_weight="1"
+            android:gravity="center">
             <Button
                 android:id="@+id/input_3_btn"
                 style="@style/inputButtonStyle"
                 android:text="X"
+                android:layout_weight="1"
+                android:gravity="center"
                 />
-
-        </LinearLayout>
-
-        <!-- Second row: 3 buttons -->
-        <LinearLayout
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:gravity="center">
-
             <Button
                 android:id="@+id/input_4_btn"
                 style="@style/inputButtonStyle"
                 android:text="X"
+                android:layout_weight="1"
+                android:gravity="center"
                 />
             <Button
                 android:id="@+id/input_5_btn"
+                style="@style/inputButtonStyle"
+                android:text="X"
+                android:layout_weight="1"
+                android:gravity="center"
+                />
+        </LinearLayout>
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_weight="1"
+            android:gravity="center">
+            <Button
+                android:id="@+id/input_7_btn"
                 style="@style/inputButtonStyle"
                 android:text="X"
                 />
@@ -180,22 +254,10 @@
                 style="@style/inputButtonStyle"
                 android:text="X"
                 />
-
-        </LinearLayout>
-        <!-- 3 row: 1 button -->
-        <LinearLayout
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:gravity="center">
-
-            <Button
-                android:id="@+id/input_7_btn"
-                style="@style/inputButtonStyle"
-                android:text="X"
-                />
         </LinearLayout>
     </LinearLayout>
+
+
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -223,6 +285,7 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:visibility="gone"
             android:orientation="horizontal">
             <Button
                 android:id="@+id/help_btn"
@@ -234,7 +297,15 @@
                 style="@style/buttonStyle"
                 android:text="Past Games"
                 />
-
+            <Button
+                android:id="@+id/settings_btn"
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:layout_margin="5dp"
+                android:backgroundTint="@color/Buttons_Garden"
+                android:drawableTop ="@drawable/round_build_24"
+                style="iconButtonStyle"
+                />
         </LinearLayout>
 
     </LinearLayout>

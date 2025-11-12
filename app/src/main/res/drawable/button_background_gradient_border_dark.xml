@@ -15,7 +15,7 @@
     <item android:state_pressed="true">
         <shape android:shape="rectangle">
             <corners android:radius="17dp" />
-            <solid android:color="@color/Buttons_Garden" />
+            <solid android:color="@color/Accent_Garden" />
             <stroke
                 android:width="7dp"
                 android:color="@android:color/white" />
@@ -29,8 +29,8 @@
             <gradient
                 android:type="linear"
                 android:angle="270"
-                android:startColor="#FF6F59"
-                android:endColor="#FF806C" />
+                android:startColor="@color/Accent_Garden"
+                android:endColor="@color/white" />
             <stroke
                 android:width="2dp"
                 android:color="@android:color/white" />
