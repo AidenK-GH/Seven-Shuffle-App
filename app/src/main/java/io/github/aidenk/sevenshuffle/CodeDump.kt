@@ -1,11 +1,15 @@
 package io.github.aidenk.sevenshuffle
 
-/*
-    This is where old code that no longer in use gets place
-    in-order not to crowd MainActivity.kt
+import org.json.JSONObject
+import java.io.BufferedReader
 
- */
-class CodeDump {
+//
+///*
+//    This is where old code that no longer in use gets place
+//    in-order not to crowd MainActivity.kt
+//
+// */
+//class CodeDump {
 
     // ------- before DataManager --------------------------------------------------------
     /*
@@ -160,4 +164,92 @@ class CodeDump {
         return true
     }
      */
+//}
+/*
+//    // Reads all lines from the word list file in assets
+//    private fun readWordsFromAssets(): List<String> {
+//        val inputStream = assets.open(fileNameWordList)
+//        val reader = BufferedReader(inputStream.reader())
+//        return reader.readLines()
+//    }
+*/
+
+/*
+private fun loadAllWordMapFromAssets(): MutableMap<String, List<String>> {
+    // 1. Read file as string
+    val jsonText = assets.open(fileNameJSONAllWordMap)
+        .bufferedReader()
+        .use { it.readText() }
+
+    // 2. Parse with org.json
+    val jsonObject = JSONObject(jsonText)
+
+    // 3. Build map
+    val map = mutableMapOf<String, List<String>>()
+    val keys = jsonObject.keys()
+    while (keys.hasNext()) {
+        val key = keys.next()
+        val jsonArray = jsonObject.getJSONArray(key)
+        val list = mutableListOf<String>()
+        for (i in 0 until jsonArray.length()) {
+            list.add(jsonArray.getString(i))
+        }
+        map[key] = list
+    }
+    return map
 }
+*/
+
+/*answersTempTextView before the fix for when there isn't a X length
+    // Updates the answersTempTextView with the list of all words categorized by length, with colored words
+//    private fun updateAnswersTempTextView() {
+//        val spannableBuilder = SpannableStringBuilder()
+//        //var textForProgressBar = ""
+//        var indexPbLenTextViewList = 0
+//
+//        wordListsByLength.keys.sorted().forEach { length ->
+//            val words = wordListsByLength[length] ?: emptyList()
+//            val totalWords = words.size
+//            val guessedWordsCount = words.count { it.isGuessed }
+//
+//            // Add header with count
+//            spannableBuilder.append("$length-letter words ($guessedWordsCount / $totalWords):\n")
+//            //textForProgressBar += "$length($guessedWordsCount/$totalWords) "
+//            pbLenTextViewList[indexPbLenTextViewList].text = "$length($guessedWordsCount/$totalWords)"
+//            indexPbLenTextViewList++
+//
+//            // Add words with color
+//            words.forEachIndexed { index, wordEntry ->
+//                val wordText = if (wordEntry.isGuessed) wordEntry.word else "_ ".repeat(wordEntry.word.length).trim()
+//                val start = spannableBuilder.length
+//                spannableBuilder.append(wordText)
+//
+//                // Set color for guessed words
+//                val color = ContextCompat.getColor(
+//                    answersTempTextView.context,
+//                    if (wordEntry.isGuessed) R.color.guessed_word_color else R.color.default_word_color
+//                )
+//                spannableBuilder.setSpan(
+//                    ForegroundColorSpan(color),
+//                    start,
+//                    spannableBuilder.length,
+//                    Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
+//                )
+//
+//                // Add a comma and space after each word, except the last one
+//                if (index < words.size - 1) {
+//                    spannableBuilder.append(", ")
+//                }
+//            }
+//
+//            // Add a new line between length groups
+//            spannableBuilder.append("\n\n")
+//        }
+//
+//        //progressBarTextview.text = textForProgressBar
+//        answersTempTextView.text = spannableBuilder
+//    }
+    */
+
+
+

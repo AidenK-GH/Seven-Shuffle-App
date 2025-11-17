@@ -30,19 +30,56 @@
             android:layout_height="wrap_content"
             android:text="X" />
     </LinearLayout>
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@color/black"
+        android:layout_marginTop="8dp"
+        android:layout_marginBottom="8dp"/>
 
-
+    <!-- Input options -->
     <TextView
         android:text="Input Options:"
         style="@style/textViewStyle"
         />
+    <Spinner
+        android:id="@+id/input_mode_Spinner"
+        style="@style/spinnerStyle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:entries="@array/input_mode_options" />
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@color/black"
+        android:layout_marginTop="8dp"
+        android:layout_marginBottom="8dp"/>
 
-    <Button
-        android:id="@+id/toggle_input_mode_btn"
-        style="@style/buttonStyle"
-        android:text="Switch Input Mode between Buttons and Keyboard"
+    <!-- Timer options -->
+    <TextView
+        android:text="Timer Options:"
+        style="@style/textViewStyle"
+        />
+    <Spinner
+        android:id="@+id/timer_options_spinner"
+        style="@style/spinnerStyle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:entries="@array/timer_options_list" />
+    <TextView
+        android:text="What is '10 seconds per word'?\nYour timer is based on how many answers exist.
+Each answer gives you 10 seconds, so big and small rounds stay balanced."
+        style="@style/textViewStyle"
         />
 
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@color/black"
+        android:layout_marginTop="8dp"
+        android:layout_marginBottom="8dp"/>
+
+    <!-- Theme options -->
     <TextView
         android:text="Theme:"
         style="@style/textViewStyle"
@@ -54,16 +91,5 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:entries="@array/theme_options" />
-
-    <TextView
-        android:text="Changing the theme will make the game restart."
-        style="@style/textViewStyle"
-        />
-
-    <TextView
-        android:id="@+id/instractions_textview"
-        style="@style/textViewStyle"
-        android:text="@string/Instructions"
-        />
 
 </LinearLayout>

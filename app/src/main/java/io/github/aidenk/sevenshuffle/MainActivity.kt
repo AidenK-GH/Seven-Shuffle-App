@@ -28,6 +28,10 @@ import org.json.JSONObject
 import java.io.BufferedReader
 import kotlin.random.Random
 import android.content.res.Configuration
+import androidx.lifecycle.lifecycleScope
+import kotlinx.coroutines.launch
+
+import io.github.aidenk.sevenshuffle.SharedPreferenceManger.InputMode
 
 class MainActivity : AppCompatActivity() {
 
@@ -35,16 +39,15 @@ class MainActivity : AppCompatActivity() {
     private val fileNameWordList = "ag_list.txt"
     private val fileNameJSONAllWordMap = "all_word_map.json"
 
-    private val themeTitleList = arrayOf("Light", "Dark", "System Default")
+    //private val themeTitleList = arrayOf("Light", "Dark", "System Default")
 
     // flags
     private var isThereAGameCurrentlyRunning = false
-    enum class InputMode {
-        KEYBOARD,
-        BUTTONS
-        // Add more later, like SWIPE, VOICE, etc.
-    }
+
+    private lateinit var prefs: SharedPreferenceManger
     private var currentInputMode: InputMode = InputMode.BUTTONS
+    private var currentTimerMode: SharedPreferenceManger.TimerMode =
+        SharedPreferenceManger.TimerMode.MIN_10
 
     // Data structure to store words categorized by their length
     private val wordListsByLength: MutableMap<Int, MutableList<WordEntry>> = mutableMapOf() // keeps the words for current game
@@ -66,18 +69,21 @@ class MainActivity : AppCompatActivity() {
     private lateinit var shuffleBtn: Button
     private lateinit var cleanBtn: Button
     private lateinit var checkBtn: Button
+    private lateinit var backBtn: Button
     //private lateinit var helpBtn: Button
     //private lateinit var gameHistoryBtn: Button
     //private lateinit var settingsBtn: Button
     private lateinit var userInputEditText: EditText
-    private lateinit var checkInputTextView: TextView
+    //private lateinit var checkInputTextView: TextView
     private lateinit var timerTextView: TextView
     private lateinit var inputLayout2Layout: LinearLayout
-    private lateinit var progressBarTextview: TextView
+    //private lateinit var progressBarTextview: TextView
 
     // Timer setup for a 5-minute countdown
-    private lateinit var gameTimer: CountDownTimer
-    private val gameDurationInMillis: Long = 10 * 60 * 1000
+    //private lateinit var gameTimer: CountDownTimer //old timer
+    //private val gameDurationInMillis: Long = 10 * 60 * 1000 //for old timer
+    // Timer
+    private var gameTimer: CountDownTimer? = null
 
     // animation fade color speed
     private val fadeColorSpeedMS: Long = 1000
@@ -90,11 +96,14 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
 
         // Managers
-        dataManager = (application as MyApp).dataManager //DataManager(this)
+        dataManager = (application as MyApp).dataManager
+        prefs = SharedPreferenceManger(this)
+
+        // Load saved input mode
+        currentInputMode = prefs.inputMode
+        currentTimerMode = prefs.timerMode
 
         // Initialize data structure
-        //allWordsMap.putAll(loadAllWordMapFromAssets())
-        //listSevenLetterWords = readWordsFromAssets().filter { it.length == 7 };
         allWordsMap = MapManager.allWordsMap
         listSevenLetterWords = MapManager.listSevenLetterWords
 
@@ -106,15 +115,16 @@ class MainActivity : AppCompatActivity() {
         shuffleBtn = findViewById(R.id.shuffle_btn)
         cleanBtn = findViewById(R.id.clean_btn)
         checkBtn = findViewById(R.id.check_btn)
+        backBtn = findViewById(R.id.back_to_menu_button)
         //helpBtn = findViewById(R.id.help_btn)
         //gameHistoryBtn = findViewById(R.id.game_history_btn)
         //settingsBtn = findViewById(R.id.settings_btn)
         userInputEditText = findViewById(R.id.userInput_EditText)
-        checkInputTextView = findViewById(R.id.checkInput_textview)
+        //checkInputTextView = findViewById(R.id.checkInput_textview)
         timerTextView = findViewById(R.id.timer_textview)
         inputLayout2Layout = findViewById(R.id.input_type_2_layout)
 
-        progressBarTextview = findViewById(R.id.progressBar_textview)
+        //progressBarTextview = findViewById(R.id.progressBar_textview)
         pbLenTextViewList = listOf(
             findViewById(R.id.pb_len3),
             findViewById(R.id.pb_len4),
@@ -134,7 +144,8 @@ class MainActivity : AppCompatActivity() {
             findViewById(R.id.input_7_btn)
         )
 
-        setupTimer()
+        timerTextView.text = "--:--"
+        //setupTimer()
         updateInputModeUI()
         disableAllControlsExceptNewGame()
 
@@ -184,7 +195,86 @@ class MainActivity : AppCompatActivity() {
                 checkUserInput()
             }
         }
+
+        backBtn.setOnClickListener {
+            if (!isThereAGameCurrentlyRunning) {
+                // behave exactly like the system Back button
+                onBackPressedDispatcher.onBackPressed()
+            } else {
+                showGoBackToMenuConfirmationDialog()
+            }
+        }
     }
+
+//    // onPause onResume
+//    override fun onPause() {
+//        super.onPause()
+//
+//        if (isGameRunning) {
+//            isPausedBySystem = true
+//            pauseGame()   // stops the CountDownTimer but keeps timeLeftMs
+//        }
+//    }
+//
+//    override fun onResume() {
+//        super.onResume()
+//
+//        if (isGameRunning && isPausedBySystem) {
+//            resumeGameIfNeeded()
+//            isPausedBySystem = false
+//        }
+//    }
+    // Sets up a new timer instance according to preferences and game size
+    private fun setupTimer(totalWordsThisGame: Int) {
+        gameTimer?.cancel()
+
+        currentTimerMode = prefs.timerMode  // refresh in case user changed settings
+
+        val durationMillis: Long = when (currentTimerMode) {
+            SharedPreferenceManger.TimerMode.MIN_5 -> 5L * 60L * 1000L
+            SharedPreferenceManger.TimerMode.MIN_10 -> 10L * 60L * 1000L
+            SharedPreferenceManger.TimerMode.PER_WORD_10S -> {
+                val seconds = totalWordsThisGame * SharedPreferenceManger.SECONDS_PER_WORD
+                (seconds.coerceAtLeast(30)) * 1000L  // optional: minimum 30 seconds
+            }
+            SharedPreferenceManger.TimerMode.NONE -> 0L
+        }
+
+        // If timer disabled
+        if (currentTimerMode == SharedPreferenceManger.TimerMode.NONE || durationMillis <= 0L) {
+            timerTextView.text = "∞"
+            gameTimer = null
+            return
+        }
+
+        gameTimer = object : CountDownTimer(durationMillis, 1000) {
+            override fun onTick(millisUntilFinished: Long) {
+                val minutes = (millisUntilFinished / 1000) / 60
+                val seconds = (millisUntilFinished / 1000) % 60
+                timerTextView.text = String.format("%02d:%02d", minutes, seconds)
+            }
+
+            override fun onFinish() {
+                endGame()
+            }
+        }
+    }
+
+    /*
+    private fun setupTimer() {
+        if (::gameTimer.isInitialized) gameTimer.cancel()
+        gameTimer = object : CountDownTimer(gameDurationInMillis, 1000) {
+            override fun onTick(millisUntilFinished: Long) {
+                val minutes = (millisUntilFinished / 1000) / 60
+                val seconds = (millisUntilFinished / 1000) % 60
+                timerTextView.text = String.format("%02d:%02d", minutes, seconds)
+            }
+
+            override fun onFinish() {
+                endGame()
+            }
+        }
+    }*/
 
     // Starts a new game by resetting game data and setting up word lists
     private fun startNewGame() {
@@ -192,12 +282,16 @@ class MainActivity : AppCompatActivity() {
         sevenLetterWord = selectRandomlyASevenLetterWordFromList()
         organizeWordsListsFromMapIntoWordListsByLength()
 
-        setupTimer()
-        gameTimer.start()
+        //setupTimer()
+        //gameTimer.start()
+        // total words available for this game
+        val totalWords = wordListsByLength.values.sumOf { it.size }
+        setupTimer(totalWords)
+        gameTimer?.start()
 
         // Shuffle and display the selected seven-letter word
         lettersTextView.text = shuffleWord(sevenLetterWord)
-        updateInputFilter()
+        //updateInputFilter() // not good, shows a number-keyboard at the start
         updateAnswersTempTextView()
 
         userInputSequence.clear()
@@ -232,30 +326,6 @@ class MainActivity : AppCompatActivity() {
                 updateUserInputFieldFromButtons()
             }
         }
-    }
-
-    private fun loadAllWordMapFromAssets(): MutableMap<String, List<String>> {
-        // 1. Read file as string
-        val jsonText = assets.open(fileNameJSONAllWordMap)
-            .bufferedReader()
-            .use { it.readText() }
-
-        // 2. Parse with org.json
-        val jsonObject = JSONObject(jsonText)
-
-        // 3. Build map
-        val map = mutableMapOf<String, List<String>>()
-        val keys = jsonObject.keys()
-        while (keys.hasNext()) {
-            val key = keys.next()
-            val jsonArray = jsonObject.getJSONArray(key)
-            val list = mutableListOf<String>()
-            for (i in 0 until jsonArray.length()) {
-                list.add(jsonArray.getString(i))
-            }
-            map[key] = list
-        }
-        return map
     }
 
     private fun updateInputModeUI() {
@@ -316,17 +386,17 @@ class MainActivity : AppCompatActivity() {
 
         if (wordEntry != null) {
             wordEntry.isGuessed = true
-            checkInputTextView.text = "CORRECT"
+            //checkInputTextView.text = "CORRECT"
             flashErrorBackground(true)
             updateAnswersTempTextView()
 
             // Check if user has won after guessing correctly
             if (hasUserWon()) {
                 endGame()
-                checkInputTextView.text = "You WON"
+                //checkInputTextView.text = "You WON"
             }
         } else {
-            checkInputTextView.text = "WRONG"
+            //checkInputTextView.text = "WRONG"
             flashErrorBackground(false)
         }
 
@@ -425,34 +495,45 @@ class MainActivity : AppCompatActivity() {
         button.backgroundTintList = ContextCompat.getColorStateList(this, colorRes)
     }
 
-    // Updates the answersTempTextView with the list of all words categorized by length, with colored words
+    private val SUPPORTED_LENGTHS = listOf(3, 4, 5, 6, 7)
     private fun updateAnswersTempTextView() {
         val spannableBuilder = SpannableStringBuilder()
-        var textForProgressBar = ""
-        var indexPbLenTextViewList = 0
 
-        wordListsByLength.keys.sorted().forEach { length ->
+        SUPPORTED_LENGTHS.forEachIndexed { index, length ->
             val words = wordListsByLength[length] ?: emptyList()
             val totalWords = words.size
             val guessedWordsCount = words.count { it.isGuessed }
 
-            // Add header with count
-            spannableBuilder.append("$length-letter words ($guessedWordsCount / $totalWords):\n")
-            textForProgressBar += "$length($guessedWordsCount/$totalWords) "
-            pbLenTextViewList[indexPbLenTextViewList].text = "$length($guessedWordsCount/$totalWords)"
-            indexPbLenTextViewList++
+            // Always update the correct TextView for this length
+            pbLenTextViewList.getOrNull(index)?.text =
+                "$length($guessedWordsCount/$totalWords)"
 
-            // Add words with color
-            words.forEachIndexed { index, wordEntry ->
-                val wordText = if (wordEntry.isGuessed) wordEntry.word else "_ ".repeat(wordEntry.word.length).trim()
+            // If you want to *skip* groups that have no words, you can bail out here:
+            if (totalWords == 0) {
+                // No words of this length – don't add to the big text block
+                return@forEachIndexed
+            }
+
+            // ===== answersTempTextView content =====
+            // Header
+            spannableBuilder.append("$length-letter words ($guessedWordsCount / $totalWords):\n")
+
+            // Words
+            words.forEachIndexed { i, wordEntry ->
+                val wordText = if (wordEntry.isGuessed)
+                    wordEntry.word
+                else
+                    "_ ".repeat(wordEntry.word.length).trim()
+
                 val start = spannableBuilder.length
                 spannableBuilder.append(wordText)
 
-                // Set color for guessed words
                 val color = ContextCompat.getColor(
                     answersTempTextView.context,
-                    if (wordEntry.isGuessed) R.color.guessed_word_color else R.color.default_word_color
+                    if (wordEntry.isGuessed) R.color.default_button_color
+                    else R.color.default_word_color
                 )
+
                 spannableBuilder.setSpan(
                     ForegroundColorSpan(color),
                     start,
@@ -460,30 +541,26 @@ class MainActivity : AppCompatActivity() {
                     Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
                 )
 
-                // Add a comma and space after each word, except the last one
-                if (index < words.size - 1) {
+                if (i < words.size - 1) {
                     spannableBuilder.append(", ")
                 }
             }
 
-            // Add a new line between length groups
             spannableBuilder.append("\n\n")
         }
 
-        progressBarTextview.text = textForProgressBar
         answersTempTextView.text = spannableBuilder
     }
 
     // Ends the game and displays all words categorized by length, with guessed words in color
     private fun endGame() {
         isThereAGameCurrentlyRunning = false
-        gameTimer.cancel()
+        gameTimer?.cancel()
 
         resetButtons()
         disableAllControlsExceptNewGame()
 
         val spannableBuilder = SpannableStringBuilder()
-
         wordListsByLength.keys.sorted().forEach { length ->
             val words = wordListsByLength[length] ?: emptyList()
             val totalWords = words.size
@@ -517,12 +594,10 @@ class MainActivity : AppCompatActivity() {
             // Add a new line between length groups
             spannableBuilder.append("\n\n")
         }
+        answersTempTextView.text = spannableBuilder
 
         // Save the game to the JSON file
         saveGameToHistory()
-
-        answersTempTextView.text = spannableBuilder
-        checkInputTextView.text = "Game ended"
     }
 
     private fun resetButtons() {
@@ -533,13 +608,24 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun saveGameToHistory() {
-        val currentGame = mapOf(
-            "date" to getCurrentDate(),
-            "sevenLetterWord" to sevenLetterWord,
-            "howManyTotalWordsCouldGet" to wordListsByLength.values.sumOf { it.size },
-            "howManyTotalWordsGot" to wordListsByLength.values.sumOf { it.count { w -> w.isGuessed } }
-        )
-        dataManager.addGame(currentGame)
+//        val currentGame = mapOf(
+//            "date" to getCurrentDate(),
+//            "sevenLetterWord" to sevenLetterWord,
+//            "howManyTotalWordsCouldGet" to wordListsByLength.values.sumOf { it.size },
+//            "howManyTotalWordsGot" to wordListsByLength.values.sumOf { it.count { w -> w.isGuessed } }
+//        )
+//        dataManager.addGame(currentGame)
+
+        lifecycleScope.launch {
+            dataManager.addGame(
+                mapOf(
+                    "date" to getCurrentDate(),
+                    "sevenLetterWord" to sevenLetterWord,
+                    "howManyTotalWordsCouldGet" to wordListsByLength.values.sumOf { it.size },
+                    "howManyTotalWordsGot" to wordListsByLength.values.sumOf { it.count { w -> w.isGuessed } }
+                )
+            )
+        }
     }
 
     private fun getCurrentDate(): String {
@@ -547,24 +633,9 @@ class MainActivity : AppCompatActivity() {
         return sdf.format(java.util.Date())
     }
 
-    // Sets up a new timer instance for a 5-minute countdown
-    private fun setupTimer() {
-        if (::gameTimer.isInitialized) gameTimer.cancel()
 
-        gameTimer = object : CountDownTimer(gameDurationInMillis, 1000) {
-            override fun onTick(millisUntilFinished: Long) {
-                val minutes = (millisUntilFinished / 1000) / 60
-                val seconds = (millisUntilFinished / 1000) % 60
-                timerTextView.text = String.format("%02d:%02d", minutes, seconds)
-            }
 
-            override fun onFinish() {
-                endGame()
-            }
-        }
-    }
-
-    //------ Dialog ------------------------------------------------------------------------------------------------------------------------
+    //------ Dialog ---------------------------------------------------------------------
     // Shows a dialog to confirm if the user wants to start a new game
     private fun showNewGameConfirmationDialog() {
         val builder = AlertDialog.Builder(this)
@@ -581,122 +652,21 @@ class MainActivity : AppCompatActivity() {
         dialog.show()
     }
 
-    /*
-    // Shows a dialog
-    private fun showHelpDialog() {
+    private fun showGoBackToMenuConfirmationDialog() {
         val builder = AlertDialog.Builder(this)
-        val dialogView = layoutInflater.inflate(R.layout.help_info, null)
+        val dialogView = layoutInflater.inflate(R.layout.ask_go_back_to_menu_dialog, null)
         builder.setView(dialogView)
 
         val dialog = builder.create()
         dialogView.findViewById<Button>(R.id.exit_button).setOnClickListener { dialog.dismiss() }
-
-        val linkTextView = dialogView.findViewById<TextView?>(R.id.github_textview)
-        linkTextView?.apply {
-            text = "https://github.com/AidenK-GH/Seven-Shuffle-App/tree/master"
-            linksClickable = true
-            movementMethod = android.text.method.LinkMovementMethod.getInstance()
+        dialogView.findViewById<Button>(R.id.no_button).setOnClickListener { dialog.dismiss() }
+        dialogView.findViewById<Button>(R.id.yes_button).setOnClickListener {
+            onBackPressedDispatcher.onBackPressed()
         }
-
         dialog.show()
     }
 
-    // Shows a dialog
-    private fun showSettingsDialog() {
-        val builder = AlertDialog.Builder(this)
-        val dialogView = layoutInflater.inflate(R.layout.setting_window, null)
-        builder.setView(dialogView)
-
-        val dialog = builder.create()
-
-        dialogView.findViewById<Button>(R.id.exit_button).setOnClickListener {
-            dialog.dismiss()
-        }
-
-        val toggleInputBtn = dialogView.findViewById<Button>(R.id.toggle_input_mode_btn)
-        toggleInputBtn.text = when (currentInputMode) {
-            InputMode.KEYBOARD -> "Switch to Buttons"
-            InputMode.BUTTONS -> "Switch to Keyboard"
-        }
-
-        val themeSpinner = dialogView.findViewById<Spinner>(R.id.themeSpinner)
-        val sharedPreferenceManger = SharedPreferenceManger(this)
-        var checkedTheme = sharedPreferenceManger.theme
-
-        // Set up adapter for spinner
-        val adapter = ArrayAdapter(
-            this,
-            android.R.layout.simple_spinner_dropdown_item,
-            themeTitleList
-        )
-        Log.d("spinner", "themeSpinner $themeSpinner")
-        Log.d("spinner", "adapter $adapter")
-        themeSpinner.adapter = adapter
-
-        // Set spinner to saved value
-        themeSpinner.setSelection(checkedTheme)
-
-        // Listen for user changes
-        themeSpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
-            override fun onItemSelected(
-                parent: AdapterView<*>?,
-                view: android.view.View?,
-                position: Int,
-                id: Long
-            ) {
-                if (position != sharedPreferenceManger.theme) {
-                    sharedPreferenceManger.theme = position
-                    AppCompatDelegate.setDefaultNightMode(
-                        sharedPreferenceManger.themeFlag[position]
-                    )
-                    dialog.dismiss()
-                }
-            }
-
-            override fun onNothingSelected(parent: AdapterView<*>?) {}
-        }
-
-        toggleInputBtn.setOnClickListener {
-            currentInputMode = when (currentInputMode) {
-                InputMode.KEYBOARD -> InputMode.BUTTONS
-                InputMode.BUTTONS -> InputMode.KEYBOARD
-            }
-            dialog.dismiss()
-            updateInputModeUI()  // This applies the visual change after dialog closes
-        }
-
-        dialog.show()
-    }
-
-    private fun showPastGamesDialog() {
-        val builder = AlertDialog.Builder(this)
-        val dialogView = layoutInflater.inflate(R.layout.past_games_board, null)
-        builder.setView(dialogView)
-        val dialog = builder.create()
-
-        val recyclerView = dialogView.findViewById<RecyclerView>(R.id.board_recycler_view)
-        val gamesList = dataManager.getPastGames()
-
-        if (gamesList.isNotEmpty()) {
-            recyclerView.layoutManager = LinearLayoutManager(this)
-            recyclerView.adapter = PastGamesAdapter(gamesList)
-        } else {
-            recyclerView.visibility = View.GONE
-            val tv = TextView(this).apply {
-                text = "No past games yet. Play one and check back!"
-                textSize = 16f
-                setTextColor(ContextCompat.getColor(context, android.R.color.black))
-                setPadding(24, 24, 24, 24)
-            }
-            (recyclerView.parent as? ViewGroup)?.addView(tv)
-        }
-
-        dialogView.findViewById<Button>(R.id.exit_button).setOnClickListener { dialog.dismiss() }
-        dialog.show()
-    }
-    */
-    //------ words ------------------------------------------------------------------------------------------------------------------------
-
+    //------ words -------------------------------------------------------------------
     //------ from map
     /**
      * Returns all 2^n subsets of the given 7-letter word.
@@ -745,14 +715,6 @@ class MainActivity : AppCompatActivity() {
     }
 
     //------ from txt
-
-    // Reads all lines from the word list file in assets
-    private fun readWordsFromAssets(): List<String> {
-        val inputStream = assets.open(fileNameWordList)
-        val reader = BufferedReader(inputStream.reader())
-        return reader.readLines()
-    }
-
     // Randomly selects a 7-letter word from the word list
     private fun selectRandomlyASevenLetterWordFromList(): String {
         return listSevenLetterWords[Random.nextInt(listSevenLetterWords.size)]

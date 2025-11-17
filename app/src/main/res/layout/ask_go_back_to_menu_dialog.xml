@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:padding="15dp"
+    android:layout_margin="25dp"
+    android:orientation="vertical"
+    android:background="@color/Background_Garden"
+    >
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:layout_margin="0dp">
+
+        <TextView
+            style="@style/textViewStyle"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Go back to the menu?" />
+
+        <Button
+            android:id="@+id/exit_button"
+            style="@style/buttonStyle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="X" />
+    </LinearLayout>
+    <TextView
+        android:text="A game is running right now, go back to the menu anyway?"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="20sp"
+        android:textStyle="bold"
+        android:layout_margin="5dp"
+        android:textColor="@color/Primary_Text_Garden"
+        />
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_gravity="center"
+        >
+        <Button
+            android:id="@+id/yes_button"
+            style="@style/buttonStyle"
+            android:text="Yes"
+            android:layout_weight="1"
+            android:gravity="center"
+            />
+        <Button
+            android:id="@+id/no_button"
+            style="@style/buttonStyle"
+            android:text="No"
+            android:layout_weight="1"
+            android:gravity="center"
+            />
+    </LinearLayout>
+</LinearLayout>

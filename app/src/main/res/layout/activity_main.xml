@@ -35,11 +35,7 @@
             <TextView
                 android:id="@+id/timer_textview"
                 android:text="00:00"
-                style="@style/textViewWithBackgroundStyle"
-                android:textSize="20sp"
-                android:layout_width="wrap_content"
-                android:gravity="center"
-                android:layout_weight="1"
+                style="@style/textViewWithOneLineRestrictionStyle"
                 />
             <Button
                 android:id="@+id/back_to_menu_button"
@@ -58,20 +54,20 @@
         android:layout_margin="5dp">
         <TextView
             android:id="@+id/letters_textview"
-            android:text="Press"
+            android:text="Seven Shuffle"
             style="@style/textViewBIGWithBackgroundStyle"
             android:background="@android:color/transparent"
             />
         <TextView
             android:id="@+id/userInput_Buttons_textview"
-            android:text="New Game"
+            android:text=""
             style="@style/textViewBIGWithBackgroundStyle"
             />
         <EditText
             android:id="@+id/userInput_EditText"
             style="@style/textViewBIGWithBackgroundStyle"
             android:digits=""
-            android:hint="New Game"
+            android:hint=""
             android:maxLength="7"
             />
     </LinearLayout>
@@ -106,30 +102,6 @@
             android:gravity="center"
             />
     </LinearLayout>
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:gravity="center"
-        android:layout_marginLeft="5dp"
-        android:layout_marginRight="5dp">
-        <TextView
-            android:id="@+id/checkInput_textview"
-            android:text=""
-            style="@style/textViewWithBackgroundStyle"
-            android:layout_width="match_parent"
-            android:gravity="center"
-            android:visibility="gone"
-            />
-        <TextView
-            android:id="@+id/progressBar_textview"
-            android:text="CLICK 'NEW GAME' BUTTON TO START"
-            style="@style/textViewWithBackgroundStyle"
-            android:layout_width="match_parent"
-            android:gravity="center"
-            android:visibility="gone"
-            />
-    </LinearLayout>
 
         <LinearLayout
             android:id="@+id/progressBar_container"
@@ -141,50 +113,31 @@
 
             <TextView
                 android:id="@+id/pb_len3"
-                style="@style/textViewWithBackgroundStyle"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:gravity="center"
+                style="@style/textViewWithOneLineRestrictionStyle"
                 android:text="3(0/0)"/>
 
             <TextView
                 android:id="@+id/pb_len4"
-                style="@style/textViewWithBackgroundStyle"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:gravity="center"
+                style="@style/textViewWithOneLineRestrictionStyle"
                 android:text="4(0/0)"/>
 
             <TextView
                 android:id="@+id/pb_len5"
-                style="@style/textViewWithBackgroundStyle"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:gravity="center"
+                style="@style/textViewWithOneLineRestrictionStyle"
                 android:text="5(0/0)"/>
 
             <TextView
                 android:id="@+id/pb_len6"
-                style="@style/textViewWithBackgroundStyle"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:gravity="center"
+                style="@style/textViewWithOneLineRestrictionStyle"
                 android:text="6(0/0)"/>
 
             <TextView
                 android:id="@+id/pb_len7"
-                style="@style/textViewWithBackgroundStyle"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:gravity="center"
+                style="@style/textViewWithOneLineRestrictionStyle"
                 android:text="7(0/0)"/>
         </LinearLayout>
 
+<!-- 7 BUTTONS INPUT -->
     <LinearLayout
         android:id="@+id/input_type_2_layout"
         android:layout_width="match_parent"
@@ -257,8 +210,7 @@
         </LinearLayout>
     </LinearLayout>
 
-
-
+<!-- Answers -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -277,35 +229,10 @@
             android:layout_margin="10dp">
                 <TextView
                     android:id="@+id/answers_temp_textview"
-                    style="@style/textViewWithBackgroundStyle"
+                    style="@style/textViewStyle"
                     android:layout_width="match_parent"
                     android:text="CLICK 'NEW GAME' BUTTON TO START"
                     />
-        </LinearLayout>
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:visibility="gone"
-            android:orientation="horizontal">
-            <Button
-                android:id="@+id/help_btn"
-                style="@style/buttonStyle"
-                android:text="Help"
-                />
-            <Button
-                android:id="@+id/game_history_btn"
-                style="@style/buttonStyle"
-                android:text="Past Games"
-                />
-            <Button
-                android:id="@+id/settings_btn"
-                android:layout_width="50dp"
-                android:layout_height="50dp"
-                android:layout_margin="5dp"
-                android:backgroundTint="@color/Buttons_Garden"
-                android:drawableTop ="@drawable/round_build_24"
-                style="iconButtonStyle"
-                />
         </LinearLayout>
 
     </LinearLayout>

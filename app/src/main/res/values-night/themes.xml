@@ -5,6 +5,7 @@
         <!-- <item name="colorPrimary">@color/my_dark_primary</item> -->
     </style>
 
+    <!-- BUTTON STYLES -->
     <style name="buttonStyle">
         <item name="android:background">@drawable/button_background_gradient_border_dark</item>
         <item name="android:backgroundTint">@null</item>
@@ -38,6 +39,7 @@
         <item name="android:background">@color/Accent_Garden</item>
     </style>
 
+    <!-- TEXT VIEW STYLES -->
     <style name="textViewStyle">
         <item name="android:textColor">@color/Accent_Garden</item>
         <item name="android:textSize">18sp</item>
@@ -46,14 +48,23 @@
         <item name="android:layout_height">wrap_content</item>
         <item name="android:layout_margin">5sp</item>
     </style>
-    <style name="textViewWithBackgroundStyle">
+    <style name="textViewWithOneLineRestrictionStyle">
         <item name="android:background">@null</item>
         <item name="android:textColor">@color/Accent_Garden</item>
         <item name="android:textSize">18sp</item>
         <item name="android:textStyle">bold</item>
-        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_width">0dp</item>
         <item name="android:layout_height">wrap_content</item>
         <item name="android:layout_margin">5sp</item>
+
+        <item name="android:gravity">center</item>
+        <item name="android:layout_weight">1</item>
+        <item name="android:singleLine">true</item>
+        <item name="android:ellipsize">end</item>
+        <item name="android:autoSizeTextType">uniform</item>
+        <item name="android:autoSizeMinTextSize">10sp</item>
+        <item name="android:autoSizeMaxTextSize">20sp</item>
+        <item name="android:autoSizeStepGranularity">1sp</item>
     </style>
     <style name="textViewBIGWithBackgroundStyle">
         <item name="android:background">@color/Primary_Text_Garden</item>
@@ -66,6 +77,7 @@
         <item name="android:gravity">center</item>
     </style>
 
+    <!-- OTHER STYLES -->
     <style name="layoutStyleBackgroundColor">
         <item name="android:background">@drawable/background_layout_gradient_dark</item>
     </style>

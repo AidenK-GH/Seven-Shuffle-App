@@ -2,6 +2,10 @@ package io.github.aidenk.sevenshuffle
 
 import android.content.Context
 import android.util.Log
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.runBlocking
 import org.json.JSONArray
 import org.json.JSONObject
 import java.io.File
@@ -12,8 +16,11 @@ class DataManager(private val context: Context) {
         private const val FOLDER = "data"
         private const val FILE = "Game_History_Board.json"
         private const val SEED = """{"gameInfo":{"pastGames":[]}}"""
+        private const val MAX_PAST_GAMES = 100
     }
 
+    // Scope for background work (can be app-wide singleton)
+    private val ioScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
     private val dir: File get() = File(context.filesDir, FOLDER)
     private val file: File get() = File(dir, FILE)
 
@@ -27,16 +34,32 @@ class DataManager(private val context: Context) {
     fun readHistoryJson(): String = ensureFile().readText(Charsets.UTF_8)
 
     /** Write the whole JSON */
-    fun writeHistoryJson(json: String) {
+    suspend fun writeHistoryJson(json: String) {
         ensureFile().writeText(json, Charsets.UTF_8)
-        Log.d("FileWrite", "Saved JSON to ${file.absolutePath}")
+        //Log.d("FileWrite", "Saved JSON to ${file.absolutePath}")
     }
 
     /** Append one game to pastGames */
-    fun addGame(game: Map<String, Any?>) {
-        val root = try { JSONObject(readHistoryJson()) } catch (_: Exception) { JSONObject(SEED) }
-        val gameInfo = root.optJSONObject("gameInfo") ?: JSONObject().also { root.put("gameInfo", it) }
-        val pastGames = gameInfo.optJSONArray("pastGames") ?: JSONArray().also { gameInfo.put("pastGames", it) }
+    suspend fun addGame(game: Map<String, Any?>) {
+        val root = try {
+            JSONObject(readHistoryJson())
+        } catch (_: Exception) {
+            JSONObject(SEED)
+        }
+        val gameInfo =
+            root.optJSONObject("gameInfo") ?: JSONObject().also { root.put("gameInfo", it) }
+        val pastGames =
+            gameInfo.optJSONArray("pastGames") ?: JSONArray().also { gameInfo.put("pastGames", it) }
+
+        // Enforce max size BEFORE adding the new one
+        if (pastGames.length() >= MAX_PAST_GAMES) {
+            // number of items to remove so we end up with MAX_PAST_GAMES - 1
+            val toRemove = pastGames.length() - MAX_PAST_GAMES + 1
+            for (i in 0 until toRemove) {
+                // Oldest = index 0, repeated removal keeps trimming from the front
+                pastGames.remove(0)
+            }
+        }
 
         pastGames.put(JSONObject(game))
         writeHistoryJson(root.toString())

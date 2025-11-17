@@ -41,7 +41,8 @@ class Splash : AppCompatActivity() {
     }
 
     private fun goToMain() {
-        startActivity(Intent(this, MainActivity::class.java))
+        //startActivity(Intent(this, MainActivity::class.java)) // to MainActivity
+        startActivity(Intent(this, MainMenuActivity::class.java)) // to MainMenuActivity
         finish()
     }
 }
