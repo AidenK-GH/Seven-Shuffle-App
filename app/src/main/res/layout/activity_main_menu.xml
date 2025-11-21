@@ -6,66 +6,84 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".MainMenuActivity"
+    android:orientation="vertical"
     android:gravity="center"
     style="@style/layoutStyleBackgroundColor">
 
     <RelativeLayout
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:layout_marginBottom="50dp"
+    android:layout_gravity="center">
+
+    <!-- TITLE AT TOP -->
+    <LinearLayout
+        android:id="@+id/title"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_gravity="center">
+        android:layout_height="wrap_content"
+        android:layout_margin="15dp"
+        android:gravity="center"
+        android:orientation="vertical"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true">
 
-        <LinearLayout
-            android:id="@+id/title"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_margin="15dp"
+        <ImageView
+            android:layout_width="72dp"
+            android:layout_height="72dp"
             android:gravity="center"
-            android:orientation="vertical"
-            tools:layout_editor_absoluteX="15dp">
-            <ImageView
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:gravity="center"
-                android:src="@drawable/ic_launcher_7_foreground" />
-            <ImageView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:gravity="center"
-                android:src="@drawable/title" />
-        </LinearLayout>
+            android:adjustViewBounds="true"
+            android:scaleType="centerInside"
+            android:contentDescription="Logo"
+            android:src="@drawable/ic_launcher_7_foreground" />
 
-        <LinearLayout
-            android:id="@+id/linearLayout"
-            android:layout_width="match_parent"
+        <ImageView
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_below="@+id/title"
-            android:layout_alignParentBottom="true"
-            android:layout_margin="15dp"
-            android:layout_marginTop="-165dp"
-            android:layout_marginBottom="313dp"
             android:gravity="center"
-            android:orientation="vertical"
-            tools:layout_editor_absoluteX="15dp">
+            android:src="@drawable/title"
+            android:contentDescription="Title"/>
+    </LinearLayout>
 
-            <Button
-                android:id="@+id/new_game_btn"
-                style="@style/buttonMenuStyle"
-                android:text="New Game" />
+    <!-- BUTTONS IN THE MIDDLE -->
+    <LinearLayout
+        android:id="@+id/linearLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="15dp"
+        android:gravity="center"
+        android:orientation="vertical"
+        android:layout_centerInParent="true">
 
-            <Button
-                android:id="@+id/game_history_btn"
-                style="@style/buttonMenuStyle"
-                android:text="Past Games" />
+        <Button
+            android:id="@+id/new_game_btn"
+            style="@style/buttonMenuStyle"
+            android:text="New Game" />
 
-            <Button
-                android:id="@+id/settings_btn"
-                style="@style/buttonMenuStyle"
-                android:text="Settings" />
+        <Button
+            android:id="@+id/game_history_btn"
+            style="@style/buttonMenuStyle"
+            android:text="Past Games" />
 
-            <Button
-                android:id="@+id/help_btn"
-                style="@style/buttonMenuStyle"
-                android:text="Help" />
-        </LinearLayout>
-    </RelativeLayout>
+        <Button
+            android:id="@+id/settings_btn"
+            style="@style/buttonMenuStyle"
+            android:text="Settings" />
+
+        <Button
+            android:id="@+id/help_btn"
+            style="@style/buttonMenuStyle"
+            android:text="Help" />
+    </LinearLayout>
+
+    <!-- TEXT LOW AT THE BOTTOM -->
+    <TextView
+        style="@style/textViewStyle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_margin="8dp"
+        android:gravity="center"
+        android:text="This app is provided as-is and may not offer full accessibility features.\nFor feedback or requests, please contact the developer."
+    />
+</RelativeLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>

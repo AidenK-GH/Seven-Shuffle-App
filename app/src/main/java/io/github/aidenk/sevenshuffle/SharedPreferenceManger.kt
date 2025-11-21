@@ -76,7 +76,7 @@ class SharedPreferenceManger(context: Context) {
 
     companion object {
         // for "10 seconds per word" option
-        const val SECONDS_PER_WORD: Int = 10
+        const val SECONDS_PER_WORD: Int = 6
     }
 
 }

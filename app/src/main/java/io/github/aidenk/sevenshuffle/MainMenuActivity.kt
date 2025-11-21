@@ -199,21 +199,25 @@ class MainMenuActivity : AppCompatActivity() {
         val dialog = builder.create()
 
         val recyclerView = dialogView.findViewById<RecyclerView>(R.id.board_recycler_view)
-        // Reverse so list is from youngest → oldest
-        val gamesList = dataManager.getPastGames().asReversed()
+        recyclerView.layoutManager = LinearLayoutManager(this)
 
-        if (gamesList.isNotEmpty()) {
-            recyclerView.layoutManager = LinearLayoutManager(this)
-            recyclerView.adapter = PastGamesAdapter(gamesList)
-        } else {
-            recyclerView.visibility = View.GONE
-            val tv = TextView(this).apply {
-                text = "No past games yet. Play one and check back!"
-                textSize = 16f
-                setTextColor(ContextCompat.getColor(context, android.R.color.black))
-                setPadding(24, 24, 24, 24)
+        // "Loading..." TextView
+        val loadingTextView = dialogView.findViewById<TextView>(R.id.loading_TextView)
+        // hide list initially
+        loadingTextView.visibility = View.VISIBLE
+        recyclerView.visibility = View.GONE
+
+        // Trigger async load
+        dataManager.getPastGamesAsync { gamesList ->
+            // This callback runs on the MAIN thread
+            if (gamesList.isNotEmpty()) {
+                loadingTextView.visibility = View.GONE
+                recyclerView.visibility = View.VISIBLE
+                recyclerView.adapter = PastGamesAdapter(gamesList.asReversed())
+            } else {
+                //recyclerView.visibility = View.GONE
+                loadingTextView.text = "No past games yet. Play one and check back!"
             }
-            (recyclerView.parent as? ViewGroup)?.addView(tv)
         }
 
         dialogView.findViewById<Button>(R.id.exit_button).setOnClickListener { dialog.dismiss() }

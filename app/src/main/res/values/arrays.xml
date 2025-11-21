@@ -12,7 +12,7 @@
     <string-array name="timer_options_list">
         <item>5 Minutes</item>
         <item>10 Minutes</item>
-        <item>10 seconds per word</item>
+        <item>6 seconds per word</item>
         <item>None</item>
     </string-array>
 </resources>

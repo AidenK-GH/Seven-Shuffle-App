@@ -1,5 +1,7 @@
 package io.github.aidenk.sevenshuffle
 
+import android.view.KeyEvent
+import android.view.inputmethod.EditorInfo
 import android.animation.ArgbEvaluator
 import android.animation.ValueAnimator
 import android.os.Bundle
@@ -28,6 +30,10 @@ import org.json.JSONObject
 import java.io.BufferedReader
 import kotlin.random.Random
 import android.content.res.Configuration
+import android.text.InputFilter
+import android.text.InputType
+import android.text.method.TextKeyListener
+import androidx.activity.addCallback
 import androidx.lifecycle.lifecycleScope
 import kotlinx.coroutines.launch
 
@@ -43,6 +49,7 @@ class MainActivity : AppCompatActivity() {
 
     // flags
     private var isThereAGameCurrentlyRunning = false
+    private var isPausedBySystem: Boolean = false
 
     private lateinit var prefs: SharedPreferenceManger
     private var currentInputMode: InputMode = InputMode.BUTTONS
@@ -78,12 +85,14 @@ class MainActivity : AppCompatActivity() {
     private lateinit var timerTextView: TextView
     private lateinit var inputLayout2Layout: LinearLayout
     //private lateinit var progressBarTextview: TextView
+    private lateinit var pauseOverlay: TextView
 
     // Timer setup for a 5-minute countdown
     //private lateinit var gameTimer: CountDownTimer //old timer
     //private val gameDurationInMillis: Long = 10 * 60 * 1000 //for old timer
     // Timer
     private var gameTimer: CountDownTimer? = null
+    private var timeLeftMs: Long = 0L          // how much time is left
 
     // animation fade color speed
     private val fadeColorSpeedMS: Long = 1000
@@ -119,10 +128,30 @@ class MainActivity : AppCompatActivity() {
         //helpBtn = findViewById(R.id.help_btn)
         //gameHistoryBtn = findViewById(R.id.game_history_btn)
         //settingsBtn = findViewById(R.id.settings_btn)
-        userInputEditText = findViewById(R.id.userInput_EditText)
         //checkInputTextView = findViewById(R.id.checkInput_textview)
         timerTextView = findViewById(R.id.timer_textview)
         inputLayout2Layout = findViewById(R.id.input_type_2_layout)
+        pauseOverlay = findViewById(R.id.pause_overlay)
+        userInputEditText = findViewById(R.id.userInput_EditText)
+
+        // 🔧 Reset everything that can block typing:
+        userInputEditText.apply {
+            isEnabled = true
+            isFocusable = true
+            isFocusableInTouchMode = true
+
+            // Clear any previous filters that might be blocking characters
+            filters = arrayOf<InputFilter>()
+
+            // Reset the key listener to a normal text key listener
+            keyListener = TextKeyListener.getInstance()
+
+            // Make sure inputType is normal text
+            inputType = InputType.TYPE_CLASS_TEXT or
+                    InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS
+        }
+
+        hidePauseOverlay()
 
         //progressBarTextview = findViewById(R.id.progressBar_textview)
         pbLenTextViewList = listOf(
@@ -204,27 +233,93 @@ class MainActivity : AppCompatActivity() {
                 showGoBackToMenuConfirmationDialog()
             }
         }
+
+        onBackPressedDispatcher.addCallback(this) {
+            //If a game is running, ask for confirmation
+            if (isThereAGameCurrentlyRunning) {
+                showGoBackToMenuConfirmationDialog()
+            } else {
+                // Temporarily disable this callback and let system handle Back
+                isEnabled = false
+                onBackPressedDispatcher.onBackPressed()
+            }
+        }
+
+        // Keyboard - Enter listener
+        userInputEditText.setOnEditorActionListener { _, actionId, event ->
+            val isEnterKey = event?.keyCode == KeyEvent.KEYCODE_ENTER &&
+                    event.action == KeyEvent.ACTION_DOWN
+
+            val isImeDone = actionId == EditorInfo.IME_ACTION_DONE ||
+                    actionId == EditorInfo.IME_ACTION_GO ||
+                    actionId == EditorInfo.IME_ACTION_SEND
+
+            if (isThereAGameCurrentlyRunning && (isEnterKey || isImeDone)) {
+                checkUserInput()   // same as pressing the Check button
+                true               // consume the event
+            } else {
+                false              // let the system handle it
+            }
+        }
+
     }
 
-//    // onPause onResume
-//    override fun onPause() {
-//        super.onPause()
-//
-//        if (isGameRunning) {
-//            isPausedBySystem = true
-//            pauseGame()   // stops the CountDownTimer but keeps timeLeftMs
+    /*
+//    override fun onBackPressed() { // gave deprecated warning.
+//so using onBackPressedDispatcher.addCallback(this) in onCreate
+//        // If a game is running, ask for confirmation
+//        if (isThereAGameCurrentlyRunning) {
+//            showGoBackToMenuConfirmationDialog()
+//        } else {
+//            // Default behavior (leave activity)
+//            super.onBackPressed()
 //        }
-//    }
-//
-//    override fun onResume() {
-//        super.onResume()
-//
-//        if (isGameRunning && isPausedBySystem) {
-//            resumeGameIfNeeded()
-//            isPausedBySystem = false
-//        }
-//    }
-    // Sets up a new timer instance according to preferences and game size
+//    }*/
+
+// --- Lifecycle: auto-pause when app goes to background ---
+    override fun onPause() {
+        super.onPause()
+
+        // Only pause if a timed game is running
+        if (isThereAGameCurrentlyRunning &&
+            currentTimerMode != SharedPreferenceManger.TimerMode.NONE &&
+            timeLeftMs > 0L &&
+            gameTimer != null
+        ) {
+            isPausedBySystem = true
+            gameTimer?.cancel()   // stop the countdown, keep timeLeftMs as last value
+            showPauseOverlay()
+        }
+    }
+
+    override fun onResume() {
+        super.onResume()
+
+        // Resume only if we previously paused because of system
+        if (isThereAGameCurrentlyRunning &&
+            isPausedBySystem &&
+            currentTimerMode != SharedPreferenceManger.TimerMode.NONE &&
+            timeLeftMs > 0L
+        ) {
+            // build a new timer starting from remaining time and start it
+            gameTimer = buildGameTimer(timeLeftMs)
+            gameTimer?.start()
+            hidePauseOverlay()
+        }
+
+        isPausedBySystem = false
+    }
+
+    private fun showPauseOverlay() {
+        pauseOverlay.visibility = View.VISIBLE
+    }
+
+    private fun hidePauseOverlay() {
+        pauseOverlay.visibility = View.GONE
+    }
+
+    /*
+    // (before onpaush and onresume)Sets up a new timer instance according to preferences and game size
     private fun setupTimer(totalWordsThisGame: Int) {
         gameTimer?.cancel()
 
@@ -258,7 +353,56 @@ class MainActivity : AppCompatActivity() {
                 endGame()
             }
         }
+    }*/
+
+    // Creates a CountDownTimer for the given duration
+    private fun buildGameTimer(durationMillis: Long): CountDownTimer {
+        timeLeftMs = durationMillis   // remember starting/remaining time
+
+        return object : CountDownTimer(durationMillis, 1000) {
+            override fun onTick(millisUntilFinished: Long) {
+                timeLeftMs = millisUntilFinished
+
+                val minutes = (millisUntilFinished / 1000) / 60
+                val seconds = (millisUntilFinished / 1000) % 60
+                timerTextView.text = String.format("%02d:%02d", minutes, seconds)
+            }
+
+            override fun onFinish() {
+                timeLeftMs = 0L
+                endGame()
+            }
+        }
     }
+
+    // Sets up a new timer instance according to preferences and game size
+    private fun setupTimer(totalWordsThisGame: Int) {
+        gameTimer?.cancel()
+
+        currentTimerMode = prefs.timerMode  // refresh in case user changed settings
+
+        val durationMillis: Long = when (currentTimerMode) {
+            SharedPreferenceManger.TimerMode.MIN_5 -> 5L * 60L * 1000L
+            SharedPreferenceManger.TimerMode.MIN_10 -> 10L * 60L * 1000L
+            SharedPreferenceManger.TimerMode.PER_WORD_10S -> {
+                val seconds = totalWordsThisGame * SharedPreferenceManger.SECONDS_PER_WORD
+                (seconds.coerceAtLeast(30)) * 1000L  // optional: minimum 30 seconds
+            }
+            SharedPreferenceManger.TimerMode.NONE -> 0L
+        }
+
+        // If timer disabled
+        if (currentTimerMode == SharedPreferenceManger.TimerMode.NONE || durationMillis <= 0L) {
+            timerTextView.text = "∞"
+            gameTimer = null
+            timeLeftMs = 0L
+            return
+        }
+
+        // build the new timer and store remaining time
+        gameTimer = buildGameTimer(durationMillis)
+    }
+
 
     /*
     private fun setupTimer() {
@@ -337,7 +481,7 @@ class MainActivity : AppCompatActivity() {
                 inputLayout2Layout.visibility = View.GONE
             }
             InputMode.BUTTONS -> {
-                userInputEditText.isEnabled = false
+                //userInputEditText.isEnabled = false
                 userInputEditText.visibility = View.GONE
                 userInputButtonsTextView.visibility = View.VISIBLE
                 inputLayout2Layout.visibility = View.VISIBLE
@@ -358,7 +502,7 @@ class MainActivity : AppCompatActivity() {
 
     // Looks at which input type we are (buttons or keyboard) and collects the input accordingly
     private fun collectUserInput(): String {
-        return when (currentInputMode) {
+        val raw = when (currentInputMode) {
             InputMode.KEYBOARD -> {
                 userInputEditText.text.toString().trim()
             }
@@ -366,10 +510,13 @@ class MainActivity : AppCompatActivity() {
                 userInputSequence.map { it.second }.joinToString("")
             }
         }
+        return raw.lowercase()
     }
 
     // Checks user input against words in wordListsByLength and updates the UI if guessed correctly
     private fun checkUserInput() {
+        val userInput = collectUserInput()
+        /*
         val userInput: String = when (currentInputMode) {
             InputMode.KEYBOARD -> {
                 userInputEditText.text.toString().trim()
@@ -378,7 +525,7 @@ class MainActivity : AppCompatActivity() {
             InputMode.BUTTONS -> {
                 collectUserInput()
             }
-        }  //by default gets buttons input
+        }  //by default gets buttons input*/
 
         val wordLength = userInput.length
         val entries = wordListsByLength[wordLength]
@@ -608,32 +755,22 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun saveGameToHistory() {
-//        val currentGame = mapOf(
-//            "date" to getCurrentDate(),
-//            "sevenLetterWord" to sevenLetterWord,
-//            "howManyTotalWordsCouldGet" to wordListsByLength.values.sumOf { it.size },
-//            "howManyTotalWordsGot" to wordListsByLength.values.sumOf { it.count { w -> w.isGuessed } }
-//        )
-//        dataManager.addGame(currentGame)
-
-        lifecycleScope.launch {
-            dataManager.addGame(
-                mapOf(
-                    "date" to getCurrentDate(),
-                    "sevenLetterWord" to sevenLetterWord,
-                    "howManyTotalWordsCouldGet" to wordListsByLength.values.sumOf { it.size },
-                    "howManyTotalWordsGot" to wordListsByLength.values.sumOf { it.count { w -> w.isGuessed } }
-                )
+        //lifecycleScope.launch {
+        dataManager.addGame(
+            mapOf(
+                "date" to getCurrentDate(),
+                "sevenLetterWord" to sevenLetterWord,
+                "howManyTotalWordsCouldGet" to wordListsByLength.values.sumOf { it.size },
+                "howManyTotalWordsGot" to wordListsByLength.values.sumOf { it.count { w -> w.isGuessed } }
             )
-        }
+        )
+        //}
     }
 
     private fun getCurrentDate(): String {
         val sdf = java.text.SimpleDateFormat("yyyy-MM-dd", java.util.Locale.getDefault())
         return sdf.format(java.util.Date())
     }
-
-
 
     //------ Dialog ---------------------------------------------------------------------
     // Shows a dialog to confirm if the user wants to start a new game
@@ -661,7 +798,9 @@ class MainActivity : AppCompatActivity() {
         dialogView.findViewById<Button>(R.id.exit_button).setOnClickListener { dialog.dismiss() }
         dialogView.findViewById<Button>(R.id.no_button).setOnClickListener { dialog.dismiss() }
         dialogView.findViewById<Button>(R.id.yes_button).setOnClickListener {
-            onBackPressedDispatcher.onBackPressed()
+            dialog.dismiss()
+            endGame()
+            finish()
         }
         dialog.show()
     }
@@ -782,8 +921,8 @@ class MainActivity : AppCompatActivity() {
         }
 
         // Disable text input regardless of mode
-        userInputEditText.isEnabled = false
-        userInputButtonsTextView.isEnabled = false
+        //userInputEditText.isEnabled = false
+        //userInputButtonsTextView.isEnabled = false
 
         // Keep New Game active
         newGameBtn.isEnabled = true
